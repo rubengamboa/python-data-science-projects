@@ -28,9 +28,11 @@ be useful to you by suggesting some programming challenges related to data
 science that you may want to try. And if you're familiar with Python but not
 with `NumPy`, `pandas`, and `matplotlib`, this book will help you learn those.
 
-Oh the other hand, if you are not an experienced programmer, then this book 
-is definitely for you. It will teach you everything you need to know in order
-to build some useful data science applications.
+Oh the other hand, if you are not an experienced programmer but would like to
+learn more about programming or how computers can be used to learn insights
+from raw data, then this book  is definitely for you. It will teach you 
+everything you need to know in order to build some useful data science 
+applications.
 
 ## How to Use This Book
 
@@ -79,4 +81,7 @@ text processing. Then Chapter 9 introduces Python modules and classes, and
 expands the project in Chapter 8 to visualize Facebook data.
 
 Finally, Chapter 10 introduces `pandas` time series data and the concept
-of linear regression.
+of linear regression. It also illustrates the place that models have in
+data science. In particular, the project is based on a simplified version
+of the the Capital Allocation Pricing Model from financial theory, and this
+model is what justifies the use of regression for this data set.
