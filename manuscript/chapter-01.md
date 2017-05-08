@@ -1,11 +1,10 @@
 # Python Basics
 
-## Goals
-
 In this project, you will learn
 
 * How to work with Python variables
 * Different Python types, e.g., integers, Booleans, and strings
+* Conditionals (if statements)
 * Loops and range
 * Formatting strings
 
@@ -24,14 +23,20 @@ and 5 can divide it. However, 6 is not a prime number, because 2 divides
 There are 4 primes between 1 and 10, namely 2, 3, 5, and 7. In this project,
 you will find the prime numbers between 1 and 100 and report how many there
 are. For instance, if there are 42 primes in this range, your program may
-print
-```
-There are 42 primes from 1 to 100.
-```
+print the following:
 
-## Python Basics
+    There are 42 primes from 1 to 100.
 
-### Variables
+If you know enough Python to do this project, that's great! Go ahead and 
+write the code, then move on to the next project! If not, don't worry.
+Take a look at the remainder of this chapter to learn what you need to
+know to do this project, then come back and do it.
+
+## Basic Python Building Blocks
+
+### Variables and Expressions
+
+### Conditionals
 
 ### Loops
 
