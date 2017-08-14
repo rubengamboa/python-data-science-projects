@@ -20,12 +20,34 @@ There are 4 primes between 1 and 10, namely 2, 3, 5, and 7. In this project, you
 
 If you know enough Python to complete this project, that's great! Go ahead and write the code, then move on to the next project! If not, don't worry. Take a look at the remainder of this chapter to learn what you need to know to do this project, then come back and do it.
 
-## Basic Python Building Blocks
+## Variables and Expressions
 
-### Variables and Expressions
+Programming involves identifying some relevant set of data and manipulating
+this data in order to achieve the intended results. For instance, if your
+program is intended to analyze the relationship between movies' critical
+score and their box-office revenue, then the relevant set of data involves
+(1) the critical score, and (2) the box-office revenue of each movie. You
+will see in a later project how you may manipulate this data to find the
+relationship (if any) between these facts.
 
-### Conditionals
+In code, all data is stored in *variables*, which you can think of as
+a data point that has a name. For example, some of my favorite football 
+player's stats may be stored in the variables `height`, `weight`, 
+`arm_length`, `hand_size`, and `dash_40`. I chose those names carefully. 
+Each is descriptive, so that you have a good chance to guess what data
+may be stored in the respective variable. I.e., you can probably guess
+that whatever is stored in the variable `height` is in fact the heigth
+of my favorite football player. I also followed the standard **naming
+conventions** when I chose those names.  All of them are in lower case,
+and a single underscore separates multiple words, as in `arm_length`.
+Moreover, I had to make some sacrifices due the **naming rules** of
+Python. According to these rules, variables names may contain letters,
+digits, and underscores, and the name must start with either a letter
+or an underscore. That explains why I settled for `dash_40` instead of
+the more descriptive name `40_yard_dash`, which isn't valid.
 
-### Loops
+## Conditionals
 
-### Formatting Strings
+## Loops
+
+## Formatting Strings
