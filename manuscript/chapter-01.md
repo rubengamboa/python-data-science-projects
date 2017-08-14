@@ -44,7 +44,16 @@ Moreover, I had to make some sacrifices due the **naming rules** of
 Python. According to these rules, variables names may contain letters,
 digits, and underscores, and the name must start with either a letter
 or an underscore. That explains why I settled for `dash_40` instead of
-the more descriptive name `40_yard_dash`, which isn't valid.
+the more descriptive name `40_yard_dash`, which isn't a valid name.
+
+The (i-am-here)
+
+    {lang=python}
+    height = 75
+    weight = 246
+    arm_length = 33.5
+    hand_size = 9.25
+    dash_40 = 4.42
 
 ## Conditionals
 
