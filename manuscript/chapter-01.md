@@ -4,9 +4,9 @@ In this project, you will learn
 
 * How to work with Python variables
 * Different Python types, e.g., integers, Booleans, and strings
-* Conditionals (if statements)
-* Loops and range
-* Formatting strings
+* Selection (if statements)
+* Iteration (loops) and range
+* Strings and string formatting
 
 ## Project: How Many Primes Are There between 1 and 100?
 
@@ -62,7 +62,7 @@ That is an excellent question. But before answering it, I want to emphasize that
 
 If you do this, Python will not notice (or care) that the variables are in the wrong units. Instead, it will compute the BMI using the expression provided, so it will assign `0.437` to `bmi` instead of the "correct" value of `31.49`. That's quite a difference!
 
-Just in case you still think this is a trivial problem, let me tell you about the Mars Polar Lander. The $110M lander was a robotic spacecraft that was part of the Mars Surveyor mission in 1998. It descended to the Martian surface, but communications stopped at the end of the descent. [NASA engineers determined](https://mars.nasa.gov/msp98/news/mco990930.html) that the problem was an error during the "transfer of information between the Mars Climate Orbiter spacecraft team in Colorado and the mission navigation team in California." You guessed it: One team used metric units and the other English units!
+Just in case you still think this is a trivial problem, let me tell you about the Mars Polar Lander. The $110M lander was a robotic spacecraft that was part of the Mars Surveyor mission in 1998. It descended to the Martian surface, but communications stopped at the end of the descent. NASA engineers determined that the problem was an error during the ["transfer of information between the Mars Climate Orbiter spacecraft team in Colorado and the mission navigation team in California"](https://mars.nasa.gov/msp98/news/mco990930.html). You guessed it: One team used metric units and the other English units!
 
 So if the computer doesn't care what units you're using, who does? Obviously, it's the programmers who care, so there must be some way to let another programmer (possibly your future self) what units your variables are using. More generally, it's important to let the other programmers (again, possibly your future self) exactly what each variable holds. Python offers a mechanism for just this programmer-to-programmer communication, and it's called a *comment*. Many beginning programmers underestimate the importance of comments, but experienced programmers know the value of proper commends and documentation. So you should get in the habit early to document your variables, so that other programmers find it easier to understand your program. I bet those NASA engineers (and the scientists who depended on that mission) wish they had done just that!
 
@@ -77,9 +77,9 @@ To write a comment in Python, simply write the comment after the character `#`. 
     dash_40 = 4.42      # Player's 40-yard dash time in seconds
 ~~~~~
 
-This illustrates an important *Rule of Style*.
+This illustrates an important *Rule of Style*:
 
-    When you use a variable for the first time, **always** document exactly what the variable represents in your program.
+>    When you use a variable for the first time, **always** document exactly what the variable represents in your program.
 
 This is important not only to communicate with other programmers, but also as a first step to avoid computing errors (colloquially known as "bugs".) Programmers are human and we make mistakes. I have seen even small programs where the same variable is used to mean different concepts in different parts of the program. In one place, for example, it may refer to the average temperature in Denver, while in another place it refers to the temperature in Denver during the AFC Championship Game. When a variable is used has two distinct meanings, the programmer can hardly be faulted for becoming confused, so the program is almost certainly wrong.
 
@@ -119,10 +119,26 @@ We can use logical expressions in Python, in just the same way we use arithmetic
 
 In the next sections, we will see the most common way that logical expressions are used in Python.
 
-## Conditionals
+## Selection
+
+Up to this point, we've been using a very simple mental model of the way in which computers execute statements. Our programs have consisted of many statements, and the computer executes these statements in order, one immediately after the other. Naturally enough, this is called *sequencing* because the computer steps through each statement in a sequence.
+
+Sequencing is great, but sometimes you will need to specify a different path through the statements in your program. *Selection* allows your program to execute different statements depending on a condition. If you're thinking that by "condition" we mean a logical expression, you're absolutely right. This is where logical expressions come into their own.
+
+To illustrate selection, suppose we have two variables `a` and `b`, and we wish to compute the **rounded** value of `a` divided by `b`. Suppose `a` is 13 and `b` is 5. As we saw previously, `a/b` is `2.6` and `a//b` is `2`, but the value we want is `3`, which is `2.6` rounded up since the fractional part of `2.6` is at least `.5`.
+
+Here's a way we could do that. Start with the quotient without remainder of `a` divided by `b`, which is `a // b` in Python. Then consider the fractional part of `a` divided by `b`. If the fractional part is at least `0.5`, then the answer is one more than the quotient; otherwise, the answer is just the quotient. Notice how this last step requires selection.
+
+We can implement this strategy in Python as follows:
+
+{title="Integer Division with Rounding", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+    rq = a // b                 # Quotient of a and b rounded to integer
+    if (a%b) >= b/2:
+        rq = rq + 1
+~~~~~
 
 
-
-## Loops
+## Iteration
 
 ## Strings (and Formatting)
