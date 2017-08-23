@@ -230,8 +230,11 @@ for i in range(100):    # i - current integer to add
 Wait a minute! This violates *Rule of Style #2*. The variable `sum100` is assigned multiple times, in lines 1 and 3.
 
 It turns out that *Rule of Style #2* is very useful, but we must modify slightly when it comes to loops. What is important is the following:
-    1. Each variable is assigned only once in any given block of statements, e.g., only once before the loop, and only once inside the loop (if at all).
-    2. If a variable is assigned inside the loop, it is only to update its value so that it conforms to its description, as specified according to *Rule of Style #1*.
+
+1. Each variable is assigned only once in any given block of statements, e.g., only once before the loop, and only once inside the loop (if at all).
+2. If a variable is assigned inside the loop, it is only to update its value so that it conforms to its description, as specified according to *Rule of Style #1*.
+
+The next paragraph goes here.
 
 
 ## Strings (and Formatting)
