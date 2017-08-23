@@ -79,7 +79,7 @@ To write a comment in Python, simply write the comment after the character `#`. 
 
 This illustrates an important *Rule of Style*:
 
->    When you use a variable for the first time, **always** document exactly what the variable represents in your program.
+>    *Rule of Style #1:* When you use a variable for the first time, **always** document exactly what the variable represents in your program.
 
 This is important not only to communicate with other programmers, but also as a first step to avoid computing errors (colloquially known as "bugs".) Programmers are human and we make mistakes. I have seen even small programs where the same variable is used to mean different concepts in different parts of the program. In one place, for example, it may refer to the average temperature in Denver, while in another place it refers to the temperature in Denver during the AFC Championship Game. When a variable is used has two distinct meanings, the programmer can hardly be faulted for becoming confused, so the program is almost certainly wrong.
 
@@ -133,12 +133,105 @@ We can implement this strategy in Python as follows:
 
 {title="Integer Division with Rounding", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
-    rq = a // b                 # Quotient of a and b rounded to integer
-    if (a%b) >= b/2:
+    rq = a // b        # Quotient of a and b rounded to nearest integer
+    if (a%b) / b >= 0.5:
         rq = rq + 1
 ~~~~~
 
+While this code works correctly, there is something unsettling about it. If you haven't seen it before, you may be worried about line 3, `rq = rq + 1`. But actually, this is not a problem. It is just like any other assignment statement. First, the value on the right-hand side of the `=` is executed, namely `rq + 1`. This uses the original value of `rq`, which was assigned in Line 1. Then this value is assigned to `rq`, so it simply gets a new value (one more than its old value). If you find this unsettling, it's only because you recall from algebra that the equation {$$}x = x+1{/$$} does not have any solutions. But recall that the `=` symbol in Python means assignment, whereas  the symbol for equality comparison is `==`. Indeed, `rq == rq + 1` is always `False`, but the assignment statement `rq = rq + 1` is perfectly reasonable.
+
+What is unsettling about this code is that the variable `rq` does not have a simple explanation. In fact, the comment on Line 1 is at best misleading; really, it's just plain wrong. It says that `rq` holds the quotient of `a` and `b` rounded to the nearest integer, but if `a` is 13 and `b` is 5, `rq` will be have the value `2` immediately after Line 1, which is wrong according to the description of the variable. Sure, Lines 2 and 3 "fix" the problem, but that only shows that the variable `rq` has a different meaning in Lines 1 and 3. This is the road to incomprehensible code. Just don't go there.
+
+Even though the Python syntax allows you to assign to a variable multiple times, and even though you will find plenty of examples on the internet that do just that, I think this is a potentially serious mistake. So I urge you to adhere to the following *Rule of Style*:
+
+>    *Rule of Style #2:* A variable should only be assigned once, though it may be used multiple times.
+
+If you think about it, you will probably agree that this rule is simply a corollary of the first rule of style. After all, if a variable is assigned multiple times, how can its description possibly be right in **all assignments**?
+
+This is how you can compute the integer division with rounding while obeying both rules of style:
+
+{title="Improved Integer Division with Rounding", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+    # rq - Quotient of a and b rounded to nearest integer
+    if (a%b) / b >= 0.5:
+        rq = a // b + 1
+    else:
+        rq = a // b
+~~~~~
+
+This example actually shows two things. First, I moved the comment that explains the variable `rq` above the `if` statement, simply because there are two places that initially assign `rq`. In fact, I do this often for "important" variables, and what makes a variable "important" or not just depends on the particular program. If you're worried that this is a violation of the second rule of style, don't be. It's just fine, because the `if` statement guarantees that only one of these assignment statements is executed.
+
+The second new thing in this example is the extended version of the `if` statement. In the first example, the `if` was followed by a simple assignment statement, which was executed only when the condition `(a%b) / b >= 0.5` in the `if` was `True`. But in the new example, the `if` also has an associated `else`, so when the condition in the `if` is `False`, the statement(s) after the `else` are executed. Again, the `if` guarantees that either the statements immediately after the `if` or the statements immediately after the `else` are executed.
+
+There is an even more extended version of the `if` statement, which is useful to differentiate between more than two possible cases.  For instance, recall the example where the Body Mass Index was examined to determine if a player was obese, overweight, etc. In total, there were four possible cases, so let's suppose that we want to define a single variable called `bmi_outcome` to store this classification. E.g., the variable should have the value 0 for underweight players, 1 for normal weight, 2 for overweight, and 3 for obese. This variable can be set in Python as follows:
+
+{title="Selection with More Than Two Cases", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+# bmi_outcome - 0 for underweight, 1 for normal, 2 for overweight, 3 for obese
+if bmi >= 30:
+    bmi_outcome = 3
+elif bmi >= 25:
+    bmi_outcome = 2
+elif bmi >= 18.5:
+    bmi_outcome = 1
+else:
+    bmi_outcome = 0
+~~~~~
+
+Notice that if `bmi` is 35, the first condition is true, so none of the other conditions is even tested. In particular, since the first condition is true, the variable `bmi_outcome` is set to `3`. Even though the second condition is also true (i.e, `bmi >= 25`), the value of `bmi_outcome` will **not** be set to `2`, since the relevant condition is not even tested. In reality, what the `elif` statements do is add the negation of the previous conditions, so the code above is equivalent to the following:
+
+{title="Explicit Selection with More Than Two Cases", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+# bmi_outcome - 0 for underweight, 1 for normal, 2 for overweight, 3 for obese
+if bmi >= 30:
+    bmi_outcome = 3
+elif not (bmi >= 30) and bmi >= 25:
+    bmi_outcome = 2
+elif not (bmi >= 30 or bmi >= 25) and bmi >= 18.5:
+    bmi_outcome = 1
+else:
+    bmi_outcome = 0
+~~~~~
+
+Of course, nobody would write the `elif` statements in this way, but it's important that you understand why the previous two examples are completely equivalent.
 
 ## Iteration
+
+Iteration is the third of the main strategies that a computer can use to decide which statement to execute next in a program, what's called the *control flow* of the program. We started with *sequencing* where the control simply flows from one instruction to the next instruction in the program. In the last section, we discussed *selection*, in which the computer decides which instruction will be the next based on the value of a logical expression. Now we will discuss *iteration*, in which the computer can execute one or more instructions repeatedly.
+
+The programming language feature that supports iteration is called a *loop*, and Python has a couple of different versions of loops.  The simplest is a `for` loop, which executes a statement a specific number of times. For example, the following loop executes the assignment statement precisely 10 times:
+
+{title="Simple For Loop", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+for i in range(10):
+    x = i
+~~~~~
+
+The loop introduces the variable `i`, which is often called the *index variable* of the loop. Naturally, you can use any legal variable name instead of `i`, though it is common to use the names `i`, `j`, and `k` for index variables. The expression `range(10)` describes the sequence of numbers 0, 1, 2, ..., 9. The way the `for` loop works is that the index variable `i` takes on each of the values in the expression `range(10)` (which is to say, 0, 1, 2, ..., 9), and then it executes the statements inside the loop (called the *body* of the loop) for each of the possible values of the index variable. In other words, the body of the loop, which is this case is just the assignment statement `x = i` is executed ten times, first with `i` equal to 0, then with `i` equal to 1, and so on, until the tenth time when `i` is equal to 9. After the loop is complete, control will follow the sequencing rule, which is to say that the computer will execute whatever statement immediately follows the loop.
+
+Quick question: What is the value of `x` after the loop? It was assigned 0 the first time through the loop, but then it was assigned 1 the second time through the loop, and so on.  At the very end, it is assigned the value of 9, so this is the value that the variable `x` has when the loop is finished.
+
+Iteration is extremely important in programming, because we often have to compute a solution incrementally. For example, suppose we wish to find the sum of the first five positive integers. We can do so with the following statement:
+
+{title="Sum of First 5 Integers", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+sum5 = 1 + 2 + 3 + 4 + 5
+~~~~~
+
+That works, but what about the sum of the first 100 integers? I certainly wouldn't want to write that expression, and even if I did, I would probably make an error somewhere, e.g., writing 633 instead of 63. But it is easy to find this value with a loop:
+
+{title="Sum of First 100 Positive Integers", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+sum100 = 0              # sum100 - Sum of positive integers up to i
+for i in range(100):    # i - current integer to add
+    sum100 = sum100 + i
+~~~~~
+
+Wait a minute! This violates *Rule of Style #2*. The variable `sum100` is assigned multiple times, in lines 1 and 3.
+
+It turns out that *Rule of Style #2* is very useful, but we must modify slightly when it comes to loops. What is important is the following:
+    1. Each variable is assigned only once in any given block of statements, e.g., only once before the loop, and only once inside the loop (if at all).
+    2. If a variable is assigned inside the loop, it is only to update its value so that it conforms to its description, as specified according to *Rule of Style #1*.
+
 
 ## Strings (and Formatting)
