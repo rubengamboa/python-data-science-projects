@@ -324,9 +324,9 @@ for i in range(1, 101): # i - current integer to add
 
 How do we know if this program is working the way we expect? I'll let you play with it and either convince yourself that the answer is correct or fix it.
 
-A> ## Python Documentation
+A> ## Read the Docs!
 A>
-A> One of the nice things about Python is that it has extensive and useful documentation, which makes it easy for you to learn about its various features. All successful programmers make it a habit of consulting  documentation, or "reading the docs" as they say.\
+A> One of the nice things about Python is that it has extensive and useful documentation, which makes it easy for you to learn about its various features. All successful programmers make it a habit of consulting  documentation, or "reading the docs" as they say.
 A>
 A> Check out the documentation for the `range` function at [docs.python.org](https://docs.python.org). You can find the relevant documentation by typing `range` in the search box. If you do this, you should be able to find a version of the `range` function that makes this program even simpler to write.
 
@@ -418,3 +418,7 @@ for i in range(len(s)): # i - index of current letter to check
 print('There are {} vowels in the phrase "{}"'.format(nvowels, s))
 # leanpub-end-insert
 ~~~~~
+
+A> ## Read the Docs!
+A>
+A> There is a lot more to Python strings than what we covered here. Learn more about it at the [official Python documentation](https://docs.python.org/3/tutorial/introduction.html#strings). The documentation is your friend. Become familiar with it!
