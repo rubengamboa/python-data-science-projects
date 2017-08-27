@@ -326,7 +326,8 @@ How do we know if this program is working the way we expect? I'll let you play w
 
 A> ## Python Documentation
 A>
-A> One of the nice things about Python is that it has extensive and useful documentation, which makes it easy for you to learn about its various features. All successful programmers make it a habit of consulting  documentation, or "reading the docs" as they say.
+A> One of the nice things about Python is that it has extensive and useful documentation, which makes it easy for you to learn about its various features. All successful programmers make it a habit of consulting  documentation, or "reading the docs" as they say.\
+A>
 A> Check out the documentation for the `range` function at [docs.python.org](https://docs.python.org). You can find the relevant documentation by typing `range` in the search box. If you do this, you should be able to find a version of the `range` function that makes this program even simpler to write.
 
 Instead, what I want to explore next is a *different* loop availabe in Python. The `for` loop executes its body a fixed number of times. E.g., in the previous loop, we know that the body will be executed precisely 100 times, just because we know how `range` works. Notice that we can reach this conclusion simply by reading the code, without having to execute it. But what if we cannot know how many times the loop should execute the body ahead of time? For example, what if we want to find the sum of the first 100 odd positive integers?
@@ -359,6 +360,61 @@ h = "hello"
 w = 'world'
 ~~~~~
 
-Python also supports some string operators, such as `+`.  This operation allows you to concatenate two string, and the result is the string that has the characters from the first string followed by those of the second string. For exampe, `h+w` is the string `"helloworld"`. Notice that there is no space between `"hello"` and `"world"`. If you wanted a space, you could use the expression `h + ' ' + w`.
+Python also supports some string operators, such as `+`.  This operation allows you to concatenate two string, and the result is the string that has the characters from the first string followed by those of the second string. For exampe, `h+w` is the string `"helloworld"`. Notice that there is no space between `"hello"` and `"world"`. If you want a space, you should use the expression `h + ' ' + w`.
 
+What is the value of `"2" + "3"`? Some people think the answer should be `"5"`, but if you read very carefully the description of string concatenation above, you should agree that the only possible answer is `"23"`. The fundamental trap here is to confuse the *number* 2 with the *string* `"2"`. Do not fall for this trap! Numbers are strings are completely different things in Python.
 
+Another useful string operation allows you to select one of the letters in a word using square brackets. For example, if `h` is `"hello"`, then `h[1]` is the letter `"e"`. Remember that computer programmers like to start counting at 0, so the first letter (`'h'`) is `h[0]`, the second one `h[1]`, and so on. The valid *indexes* inside the square brackets are integers in the range 0 to {$$}n-1{/$$}, where {$$}n{/$$} is the length, or the number of characters in the string. In Python, you can compute the length of a string `h` with the expression `len(h)`. For example, the following short program counts the number of vowels in the string `s`:
+
+{title="Number of Vowels", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+# s - a string
+# nvowels - # of vowels from letter 0 up to but not including letter i of s
+s = "my hovercraft is full of eels"
+nvowels = 0
+for i in range(len(s)): # i - index of current letter to check
+    if s[i] == 'a' or s[i] == 'e' or s[i] == 'i' or s[i] == 'o' or s[i] == 'u':
+        nvowels = nvowels + 1
+~~~~~
+
+Be sure you understand how `len(s)` and `range` work together above, so that the index variable `i` ranges over the position of each letter in `s`!
+
+Strings are essential for communication between humans and computers. For example, you may wish to tell the use that
+
+> There are 8 vowels in the phrase "my hovercraft is full of eels"
+
+To do so, you must *construct* a string that contains some boilerplate text (`"There are ... vowels in the phrase "..."`), a number (8), and another string (`"my hovercraft is full of eels"`. Python makes it easy to construct strings in this way. First, you need to build a string that has the boilerplate, but with the characters `{}` in place of the `...` we used above. Let's say the boilerplate is in a string called `b`. Then, you can construct the final string by calling `b.format(x1, x2, x3)`, where `x1`, `x2`, and `x3` are the values that will fill in the boilerplate.
+
+For example, the string above can be produced as follows:
+
+{title="Number of Vowels", lang=python, line-numbers=on, starting-line-number=8}
+~~~~~
+# s - a string
+# nvowels - # of vowels from letter 0 up to but not including letter i of s
+s = "my hovercraft is full of eels"
+nvowels = 0
+for i in range(len(s)): # i - index of current letter to check
+    if s[i] == 'a' or s[i] == 'e' or s[i] == 'i' or s[i] == 'o' or s[i] == 'u':
+        nvowels = nvowels + 1
+# leanpub-start-insert
+'There are {} vowels in the phrase "{}"'.format(nvowels, s)
+# leanpub-end-insert
+~~~~~
+
+Actually, that doesn't quite do what we want. The result of the last line is to *compute* a string that has the information we want to show the user, but we haven't actually *displayed* that information to the user. Python supports several different ways of doing this, but for now we'll discuss just one. The Python built-in `print` is used to display a string at a console. If you are running Python from a command line, then the console is just the same window in which you are running Python. If you run Python from an IDE, like Canopy or Anaconda, then the IDE will display console output in a special window. Regardless of the specific mechanism, the effect of the statement `print("hello")` is to output `hello` (without the quotes) to the console. So what we really meant to write above is the following:
+{title="Number of Vowels", lang=python, line-numbers=on, starting-line-number=8}
+~~~~~
+# s - a string
+# nvowels - # of vowels from letter 0 up to but not including letter i of s
+s = "my hovercraft is full of eels"
+nvowels = 0
+for i in range(len(s)): # i - index of current letter to check
+    if s[i] == 'a' or s[i] == 'e' or s[i] == 'i' or s[i] == 'o' or s[i] == 'u':
+        nvowels = nvowels + 1
+# leanpub-start-delete
+'There are {} vowels in the phrase "{}"'.format(nvowels, s)
+# leanpub-end-delete
+# leanpub-start-insert
+print('There are {} vowels in the phrase "{}"'.format(nvowels, s))
+# leanpub-end-insert
+~~~~~
