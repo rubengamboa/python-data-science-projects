@@ -402,6 +402,7 @@ for i in range(len(s)): # i - index of current letter to check
 ~~~~~
 
 Actually, that doesn't quite do what we want. The result of the last line is to *compute* a string that has the information we want to show the user, but we haven't actually *displayed* that information to the user. Python supports several different ways of doing this, but for now we'll discuss just one. The Python built-in `print` is used to display a string at a console. If you are running Python from a command line, then the console is just the same window in which you are running Python. If you run Python from an IDE, like Canopy or Anaconda, then the IDE will display console output in a special window. Regardless of the specific mechanism, the effect of the statement `print("hello")` is to output `hello` (without the quotes) to the console. So what we really meant to write above is the following:
+
 {title="Number of Vowels", lang=python, line-numbers=on, starting-line-number=8}
 ~~~~~
 # s - a string
