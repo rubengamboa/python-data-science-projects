@@ -396,9 +396,7 @@ nvowels = 0
 for i in range(len(s)): # i - index of current letter to check
     if s[i] == 'a' or s[i] == 'e' or s[i] == 'i' or s[i] == 'o' or s[i] == 'u':
         nvowels = nvowels + 1
-# leanpub-start-insert
 'There are {} vowels in the phrase "{}"'.format(nvowels, s)
-# leanpub-end-insert
 ~~~~~
 
 Actually, that doesn't quite do what we want. The result of the last line is to *compute* a string that has the information we want to show the user, but we haven't actually *displayed* that information to the user. Python supports several different ways of doing this, but for now we'll discuss just one. The Python built-in `print` is used to display a string at a console. If you are running Python from a command line, then the console is just the same window in which you are running Python. If you run Python from an IDE, like Canopy or Anaconda, then the IDE will display console output in a special window. Regardless of the specific mechanism, the effect of the statement `print("hello")` is to output `hello` (without the quotes) to the console. So what we really meant to write above is the following:
@@ -412,12 +410,7 @@ nvowels = 0
 for i in range(len(s)): # i - index of current letter to check
     if s[i] == 'a' or s[i] == 'e' or s[i] == 'i' or s[i] == 'o' or s[i] == 'u':
         nvowels = nvowels + 1
-# leanpub-start-delete
-'There are {} vowels in the phrase "{}"'.format(nvowels, s)
-# leanpub-end-delete
-# leanpub-start-insert
 print('There are {} vowels in the phrase "{}"'.format(nvowels, s))
-# leanpub-end-insert
 ~~~~~
 
 A> ## Read the Docs!
