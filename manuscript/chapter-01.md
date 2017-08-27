@@ -234,7 +234,131 @@ It turns out that *Rule of Style #2* is very useful, but we must modify slightly
 1. Each variable is assigned only once in any given block of statements, e.g., only once before the loop, and only once inside the loop (if at all).
 2. If a variable is assigned inside the loop, it is only to update its value so that it conforms to its description, as specified according to *Rule of Style #1*.
 
-The next paragraph goes here.
+The first point is pretty clear. A *block* of code is a sequence of statements, and each block should assign to a variable only once. But a statement may contain other blocks inside it, such as a `for` loop. Again, we require that each block assign to a variable only once, but there may be more than one assignment to a variable in the entire program. This opens the door to inconsistent assignment to the variable, which is why the second point is so important. What it says is that a variable should have a second assignment **only** to make sure that the description of the variable is correct.
 
+Let's consider the specific example above. The variable `sum100` is described as the "Sum of positive integers up to i," where `i` is the index variable in the loop (described as the "current integer to add"). Before the loop starts, there are no "integers up to i", so the value of the sum is zero, and this is reflected in the assignment statement in Line 1. But notice what happens when execute the body in the loop. At this point, the index variable `i` is set to the next integer to add, so the value of `sum100` is no longer correct, according to its description. The assignment in Line 3 resolves this problem. In fact, let's say we've gone through the loop a few times `i` has the value 10. At this point, sum100 has the sum of the integers 1, 2, ..., up to 10, in accordance with its description. But then we go through the loop one more time, this time with `i` equal to 11. At this point, the value of `sum100` is no longer correct (since it only sums up to 10), but the statement in Line 3 updates the value of `sum100` perfectly. After all, it should have the sum of the integers 1, 2, ..., up to 11, which is exactly the sum of the integers 1, 2, ..., up to 10, plus 11. And that is exactly the value of the expression `sum100 + i` in the right-hand side of Line 3.
+
+If you run the program above, you will get the answer 4,950. Is that right? Is it wrong? It's hard to tell in this case, unless you happen to know the sum of the first 100 positive integers. But these are precisely the questions you should **always** be asking when you write a program. In fact, you will probably spend more time ascertaining whether your program is right (and subsequently fixing it) than writing the program in the first place!
+
+So how should we proceed? Finding the sum of the first 100 positive integers is hard, but what if we only added up the first five of them? Then it's easy for us to check the answer, which is `1 + 2 + 3 + 4 + 5 = 15`. So we can modify the program by changing `range(100)` to `range(5)` and running it. Try it! 
+
+The result I got when I tried it was 10, so something has gone wrong. At this point, you can try a few different experiments to uncover the problem. For example, if you run the program with `range(4)`, you will find that the sum is 6 instead of 10. This is a remarkable clue. It appears that we are adding up the positive integers up to 4 (or 5 or 100), but not including the last number.
+
+At this point, the answer is clear. You might remember that when we introduced the `for` loop, we said that the index variable `i` in the loop containing `range(10)` would have the values 0, 1, 2, ..., up to 9. These are ten different values, so the body is loop is processed ten times, but the index variable counts starting at 0 instead of 1. Counting from 0 is a peculiar tradition among computer programmers. One gets used to this convention.
+
+You can see what `range` does by expanding. In Python, you can type `list(range(5))`, and that will show you the values that the index variable will take: `[0, 1, 2, 3, 4]`. 
+
+Now that we understand what's happening, how can we fix it? As is often the case, there are several solutions. For example, you may have noticed that the numbers in `range(5)` are almost the ones we want, with the exception that each number is exactly one less than we want it to be. I.e., we have the numbers `[0, 1, 2, 3, 4]`, but we want `[1, 2, 3, 4, 5]`. This observation suggests a simple solution:
+
+{title="Sum of First 100 Positive Integers, Fix #1", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+sum100 = 0              # sum100 - Sum of positive integers up to i
+for i in range(100):    # i - current integer to add
+    sum100 = sum100 + i + 1
+~~~~~
+
+That will work, but I do not like it. The problem is that understanding Line 3 requires too much thought. Why are we adding `i+1` instead of `i`? Oh yeah, that's because the 10th time through the loop, `i` will be 9 instead of 10. That forces you to remember too many things to understand what is really happening.
+
+Here is another solution:
+
+{title="Sum of First 100 Positive Integers, Fix #2", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+sum100 = 100            # sum100 - Sum of positive integers up to i
+for i in range(100):    # i - current integer to add
+    sum100 = sum100 + i
+~~~~~
+
+I like this solution even less. Not only does it force you to remember that the loop only adds up the numbers up to 99, it makes Line 1 appear incorrect. In particular, after Line 1 is executed, `sum100` does **not** have the value described by the appropriate comment. That is simply unacceptable.
+
+We can address that objection with this solution:
+
+{title="Sum of First 100 Positive Integers, Fix #3", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+sum100 = 0              # sum100 - Sum of positive integers up to i
+for i in range(100):    # i - current integer to add
+    sum100 = sum100 + i
+sum100 = sum100 + 100
+~~~~~
+
+Again this works, but I do not like the solution. I have two problems with the solution, in fact.  First, consider the statements in Lines 1, 2, and 4. These statements are executed sequentially, but they contain two assignments to `sum100` in violation of *Rule of Style #2*. Moreover, just focus on Line 4. Why are we adding 100 to `sum100`? This is really a violation of *Rule of Style #1*! According to its description, `sum100` has the sum of the positive integers up to `i`, but this cannot possibly be true as Line 4 is executed.
+
+A more clever solution may be the following:
+
+{title="Sum of First 100 Positive Integers, Fix #4", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+sum100 = 0              # sum100 - Sum of positive integers up to i
+for i in range(101):    # i - current integer to add
+    sum100 = sum100 + i
+~~~~~
+
+Notice that we are using `range(101)` instead of `range(100)`, since the former will include the integers up to *and including* 100. This actually works well. You may feel uneasy about having the number 101 when we want to stop at 100, but that feeling will pass as you get more comfortable with Python built-ins, like `range`. In other words, if you understand the basic Python builing blocks, then you will read `range(101)` and immediately grasp what the loop does. I do not feel the same way about adding `i + 1` inside the loop, for example, because that forces you to think about **both** the building blocks in Python, like `range`, **and** what the original programmer (possibly you, three months ago) did to get around them.
+
+The only thing I do not like about this last solution is that it doesn't just add 1, 2, 3, ..., up to 100. It actually adds 0, 1, 2, ..., up to 100. That first zero doesn't change the result for addition, but it would be catastrophic if we were trying to find, say, the **product** of the first 100 positive integers.
+
+What we want is something like `range` but starting the count at 1 instead of 0. It turns out that `range` itself offers a solution! When you call it with just one argument, as in `range(101)`, it starts counting at 0. But if you call it with two arguments, as in `range(1, 101)`, it treats the first argument as the starting place to count from.
+
+You may remember that `list(range(5))` returned the values `[0, 1, 2, 3, 4]`. But if you run `list(range(1, 5))`, what you will get is `[1, 2, 3, 4]`. By giving two arguments to `range`, you can specify the starting value. Notice, however, that `range` starts with the first argument, but it stops **before** the second argument. So `range(1, 5)` returns `[1, 2, 3, 4]` and **not** `[1, 2, 3, 4, 5]`.  That's a small gotcha that you should avoid.
+
+So my preferred solution is the following:
+
+{title="Sum of First 100 Positive Integers, Final Fix", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+sum100 = 0              # sum100 - Sum of positive integers up to i
+for i in range(1, 101): # i - current integer to add
+    sum100 = sum100 + i
+~~~~~
+
+This requires a clear understanding of the Python built-in `range`, but it makes the programmer's intent clear. That is the essence of clear code, and that's the way to ensure that your programs works (or at the very least that it's simple to fix).
+
+To further appreciate the power of iteration, consider a similar problem. What if we wanted to find the sum of the *odd* integers between 1 and 100? That is, how can we find the value of `1 + 3 + 5 + ... + 99`?
+
+One way is to modify the previous program. We'll consider each of the numbers 1, 2, 3, ..., up to 100, but we'll add it only when it's odd. And we can check for that in an `if` statement:
+
+{title="Sum of Odd Positive Integers Up To 100", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+sum_odds_upto100 = 0    # sum_odds_upto100 - Sum of odd positive integers up to i
+for i in range(1, 101): # i - current integer to add
+    if i%2 == 1:
+        sum_odds_upto100 = sum_odds_upto100 + i
+~~~~~
+
+How do we know if this program is working the way we expect? I'll let you play with it and either convince yourself that the answer is correct or fix it.
+
+A> ## Python Documentation
+A>
+A> One of the nice things about Python is that it has extensive and useful documentation, which makes it easy for you to learn about its various features. All successful programmers make it a habit of consulting  documentation, or "reading the docs" as they say.
+A> Check out the documentation for the `range` function at [docs.python.org](https://docs.python.org). You can find the relevant documentation by typing `range` in the search box. If you do this, you should be able to find a version of the `range` function that makes this program even simpler to write.
+
+Instead, what I want to explore next is a *different* loop availabe in Python. The `for` loop executes its body a fixed number of times. E.g., in the previous loop, we know that the body will be executed precisely 100 times, just because we know how `range` works. Notice that we can reach this conclusion simply by reading the code, without having to execute it. But what if we cannot know how many times the loop should execute the body ahead of time? For example, what if we want to find the sum of the first 100 odd positive integers?
+
+Python's `while` loop fills this gap very nicely. Instead of specifying how many times the loop should execute, a `while` loop lets you specify a condition that tests whether the loop should continue executing. That is, the loop stops when the condition becomes false. For instance, to find the sum of the first 100 odd positive integers, we can use a counter that keeps track of how many such integers we've found so far, and the loop exists when the condition `nodds < 100` becomes false:
+
+{title="Sum of First 100 Odd Positive Integers", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+n = 1                   # Current positive integer to consider
+nodds = 0               # Number of odd positive integers seen so far
+sum_odds_100 = 0        # Sum of first nodds odd positive integers 
+while nodds < 100:
+    if n%2 == 1:
+        sum_odds_100 = sum_odds_100 + n
+        nodds = nodds + 1
+    n = n + 1
+~~~~~
+
+Notice that the loop will continue to execute as long as `nodds` is less than 100. That is, it will exit after finding the first 100 odd positive integers. Notice also how the `if` statement in Line 5 works to identify those integers, and how it updates both the sum of the odd integers and the number of odd integers have that been found.
 
 ## Strings (and Formatting)
+
+So far, we have only discussed arithmetic and logical expressions. Now we'll switch our focus to strings, which can be used to represent words and phrases, and to prepare output intended for humans.
+
+A string is just a sequence of characters, and it must be quoted in Python. You can use either single quotes or double quotes, so these are both fine:
+
+{title="Example of Strings", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+h = "hello"
+w = 'world'
+~~~~~
+
+Python also supports some string operators, such as `+`.  This operation allows you to concatenate two string, and the result is the string that has the characters from the first string followed by those of the second string. For exampe, `h+w` is the string `"helloworld"`. Notice that there is no space between `"hello"` and `"world"`. If you wanted a space, you could use the expression `h + ' ' + w`.
+
+
