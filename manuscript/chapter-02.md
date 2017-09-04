@@ -17,10 +17,10 @@ To do this, we will start with refactoring the solution from the previous projec
 
 Of course, instead of "Mystery Functions" you will plot some actual functions that you think may be similar to the number of primes. Part of doing data science is making such educated guesses, but here are some ideas to help you get started:
 
-* {$$}\sqrt{N}{/$$}
-* {$$}N^{0.9}{/$$}
-* {$$}\ln{N}{/$$}
-* {$$}N / \ln{N}{$$}
-* {$$}\sqrt{N} / \ln{N}{/$$}
+* {$$}\sqrt{N}{/$$}.
+* {$$}N^{0.9}{/$$}.
+* {$$}\ln{N}{/$$}.
+* {$$}N / \ln{N}{/$$}.
+* {$$}\sqrt{N} / \ln{N}{/$$}.
 
 Remember, there are at most {$$}N/2{/$$} primes from 1 to N, so all candidate functions should be smaller than that.
