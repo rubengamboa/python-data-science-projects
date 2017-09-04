@@ -85,7 +85,7 @@ When a function has optional arguments, it can be confusing to determine what va
 * `sum_pos_ints(10, N=15)`
 * `sum_pos_ints(M=10, N=15)`
 
-Generally speaking, I prefer the third alternative in this case because it makes it painfully clear what the arguments mean. (It would be even better if the arguments had better names, like `n_start` and `n_end`.) In cases where the first argument is almost always relevant but the arguments with default values are rare, I may use either of the first two alternatives, though I favor the second.
+Generally speaking, I prefer the third alternative in this case because it makes it painfully clear what the arguments mean. (It would be even better if the arguments had better names, like `start` and `stop`.) In cases where the first argument is almost always relevant but the arguments with default values are rare, I may use either of the first two alternatives, though I favor the second.
 
 Essentially, that is all there is to defining functions in Python, but there is one remaining concept that can be confusing. Variables in one function are completely separate from variables in other functions. So just because you defined the variable `sum` in the function `sum_up_to` does not mean that you can use `sum` in any other function. In a sense, this variable **belongs to** the function `sum_up_to`, so it doesn't exist outside of this function.
 
@@ -94,6 +94,99 @@ This is actually not as strange as it may appear at first. For example, consider
 Things are a little more complicated when you use a variable in a function *and* in the same file but outside of any function definitions, what's referred to as *global scope*. In that case, the variable in the function is the same as the one used in the file, although Python prevents you from *modifying* that variable in the function unless you explicitly mark the variable for updates. (See `global` if you're interested in doing that, but I recommend against writing code that changes global variables.) This is normally not a problem, because we generally avoid using code outside of function definitions.
 
 ## Documenting and Testing Functions
+
+We have seen that one of the primary goals of functions is to allow code to be written once and used multiple times in many different contexts. But that means that you must be able to find out what existing functions do, so that you know *when* and *how* to call them. Moreover, when you write new functions, you should be able to help the potential users of your functions (possibly a future *you*) by writing down sufficient information about your functions so that they can learn *when* and *how* to call them.
+
+That is the purpose of *documentation*, and we have already seen that the built-in Python functions are documented extensively, so for example you can learn all about the function `len` by looking at its documentation. In an integrated development environment or IDE, like Canopy, you can browse the official documentation in the Doc Browser, you can press a tab after a call to `len` in the Editor Window, or you can type `help(len)` or `?len` in the Python Console Window. IDEs are definitely the recommended way to program in Python, but if you must invoke Python from a shell, you can type `help(len)` to access the documentation for `len`.
+
+The same is almost true for your functions when you provide documentation. Suppose you wrote a function called `myfn`. You, or another user of your functions, can access the documentation using the tab key in the Editor Window or by typing `help(myfn)` or `?myfn` in the Python Console.
+
+So the remaining question is how, exactly, can you provide the adequate documentation. The Python mechanism is via a *docstring*, which is simply a string that appears immediately after the `def` line that defines your function. For example, very basic documentation can be provided as follows:
+
+{title="Listing 2.5: Documented Function To Find Sum of First N Positive Integers", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+def sum_up_to(N):
+    "Find the sum of the positive integers up to a given limit."
+    return N*(N+1)//2
+~~~~~
+
+Documentation should be much more extensive than the single line given above, but it is always just a string that happens to appear immediately after the definition of the function. Python supports a special syntax for strings that span multiple lines, like typical docstrings. These multiline strings are demarcated with *three* double quotes instead of just one:
+
+{title="Listing 2.6: Documented Function To Find Sum of First N Positive Integers", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+def sum_up_to(N):
+    """Find the sum of the positive integers up to and including a given bound.
+
+    Computes the sum of the numbers 1 + 2 + ... + `N`.
+    """
+    return N*(N+1)//2
+~~~~~
+
+This more comprehensive documentation illustrates a common convention, which is to provide a short, one-line description of the function. For many functions, this is sufficient. But if more information is useful, the single-line description can be followed by one or more paragraphs that more fully describe the function. By convention, the one-line description does not refer to the arguments by name, but the arguments can be named in the longer description, where they should be enclosed by single backquotes.
+
+When it comes to documentation, you are bound to run into many different styles. Different programmers follow different conventions for writing docstrings. In modern Python, many if not most programmers follow a convention that was popularized by the `numpy` package, which is one of the most useful and important packages in Python. We will learn more about `numpy` in later projects, but for now we'll discuss the `numpy` convention for docstrings. According to this convention, a docstring should consist of the following:
+
+* A single line giving a short description of the function, without any mention of the function's argument names.
+* If necessary, one or more paragraphs that give a more detailed description of the function. This description can refer to the arguments by enclosing them in single backquotes. The description should describe what the function does, but it should not discuss *how* the function does it.
+* A section called *Parameters*, which describes each of the parameters that the function needs. Each parameter should be described in two lines. The first has the name and *type* of the parameter, separated by a colon surrounded by a single space. The second line is indented, and it has a short description of the parameter and how it is interpreted by the function.
+* A section called *Returns* that describes the value returned by the function. This is also split into two lines. The first line has the type of the return value, and the second line has a short description.
+* An optional section called *Notes* that contains any extra information that may be necessary. This is the place, for example, where you can document something about the *implementation* of the function. I.e., this is where you may wish to discuss *how* the function does what it does. This is also a place where you may discuss limitations of your function, e.g., if it uses a large amount of space.
+* A section called *Examples* that contains one or more example calls and the value returned by each call. The calls are given in a line that starts with ">>>" and the return value is given in the next line.
+
+There should be a blank line between each section, and named sections should be introduced with a line that has the name of the section followed by a line with a "-" character underneath each letter in the name.
+
+To make this convention clear, Listing 2.7 shows a fully documented version of the function `sum_up_to`:
+
+{title="Listing 2.7: Fully Documented Function To Find Sum of First N Positive Integers", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+def sum_up_to(N):
+    """Find the sum of the positive integers up to and including a given bound.
+
+    Computes the sum of the numbers 1 + 2 + ... + `N`.
+
+    Parameters
+    ----------
+    N : int
+        The (inclusive) upper bound for the sum.
+
+    Returns
+    -------
+    int
+        The sum of the numbers 1, 2, ..., `N`.
+
+    Notes
+    -----
+
+    For efficiency, this function finds the sum of the first `N` numbers by 
+    using Gauss's excellent formula for this sum:
+
+    --math:: \sum_{i=1}^{N}{i} = \frac{N(N+1)}{2}
+
+    Examples
+    --------
+    >>> sum_up_to(0)
+    0
+    >>> sum_up_to(-1)
+    0
+    >>> sum_up_to(1)
+    1
+    >>> sum_up_to(4)
+    10
+    >>> sum_up_to(10)
+    55
+    """
+    return N*(N+1)//2
+~~~~~
+
+Notice how each named section in Listing 2.7 is introduced by a heading followed by a line of "-" symbols. Notice also how the *Notes* section allows you to use mathematical equations. The equation is specified in LaTeX format, which is beyond the scope of this book. If you are planning on learning more about mathematics or computing, I recommend that you learn LaTeX, at least well enough to write simple documents. This [LaTeX tutorial](https://www.latex-tutorial.com) is a good place to start.
+
+You are probably feeling a little strange that Listing 2.7 contains 35 lines of documentation for only two lines of Python code. This is a bit extreme, because this specific function is so small, just one line of code. But it is not excessive. The primary goal is to write a function once but use it multiple times. The lines of Python are for the "write once" process, but the documentation is for the many times that we plan this function to be used. So it does make sense that the documentation is longer and that it may take even more time to write than the actual function. In fact, documentation is so important that I feel it warrants another *Rule of Style*:
+
+>    *Rule of Style #3:* Each function should *always* be extensively documented using the `numpy` docstring convention.
+
+
+
+
 
 ## Lists in Python
 
