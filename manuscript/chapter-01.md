@@ -28,7 +28,7 @@ In code, all data is stored in *variables*, which you can think of as a data poi
 
 The variables can be *assigned* values as follows:
 
-{title="Variable Assignment", lang=python}
+{title="Listing 1.1: Variable Assignment", lang=python}
 ~~~~~
     height = 75
     weight = 246
@@ -41,7 +41,7 @@ The first line assigns the value 75 to the variable `height`, so when `height` i
 
 These assignments all used constant values, like 75 or 33.5, on the right-hand side, but more generally we can use mathematical expressions, such as `2*height` or `weight/3`. Python supports all common mathematical expressions, including addition, subtraction, multiplication, division, exponentiation, and parentheses. For example, the Body Mass Index (BMI) is defined as a person's weight divided by the square of his or her height. To calculate my favorite player's BMI, you could use the following Python expression:
 
-{title="Arithmetic Expression", lang=python, line-numbers=on, starting-line-number=6}
+{title="Listing 1.2: Arithmetic Expression", lang=python, line-numbers=on, starting-line-number=6}
 ~~~~~
     bmi = (0.45 * weight) / (0.025 * height)**2
 ~~~~~
@@ -52,11 +52,8 @@ This all makes sense. But wait a minute! Shouldn't that just be `weight / height
 
 That is an excellent question. But before answering it, I want to emphasize that *the computer does not care*. Suppose `weight` is in inches and `height` is in pounds, but you execute the following in Python:
 
-{title="Arithmetic Expression Fail", lang=python, line-numbers=on, starting-line-number=6}
+{title="Listing 1.3: Arithmetic Expression Fail", lang=python, line-numbers=on, starting-line-number=6}
 ~~~~~
-    #leanpub-start-delete
-    bmi = (0.45 * weight) / (0.025 * height)**2
-    #leanpub-end-delete
     bmi = weight / height**2
 ~~~~~
 
@@ -68,7 +65,7 @@ So if the computer doesn't care what units you're using, who does? Obviously, it
 
 To write a comment in Python, simply write the comment after the character `#`. Python will ignore the remainder of the line (starting with the `#` and going all the way until the end of the line), but humans can read the comment and use it to understand the program. Here is a better way to write those variable assignments:
 
-{title="Documented Variable Assignment", lang=python}
+{title="Listing 1.4: Documented Variable Assignment", lang=python}
 ~~~~~
     height = 75         # Player's height in inches
     weight = 246        # Player's weight in pounds
@@ -107,7 +104,7 @@ There are three logical operators, `and`, `or`, and `not`. The meaning of `and` 
 
 We can use logical expressions in Python, in just the same way we use arithmetic expressions. For example, we can use logical expressions to assign values to these new expressions:
 
-{title="Logical Expressions", lang=python, line-numbers=on, starting-line-number=7}
+{title="Listing 1.5: Logical Expressions", lang=python, line-numbers=on, starting-line-number=7}
 ~~~~~
     obese = bmi >= 30           # True if player is considered obese
     overweight = bmi >= 25 and bmi < 30
@@ -131,7 +128,7 @@ Here's a way we could do that. Start with the quotient without remainder of `a` 
 
 We can implement this strategy in Python as follows:
 
-{title="Integer Division with Rounding", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.6: Integer Division with Rounding", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
     rq = a // b        # Quotient of a and b rounded to nearest integer
     if (a%b) / b >= 0.5:
@@ -150,7 +147,7 @@ If you think about it, you will probably agree that this rule is simply a coroll
 
 This is how you can compute the integer division with rounding while obeying both rules of style:
 
-{title="Improved Integer Division with Rounding", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.7: Improved Integer Division with Rounding", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
     # rq - Quotient of a and b rounded to nearest integer
     if (a%b) / b >= 0.5:
@@ -165,7 +162,7 @@ The second new thing in this example is the extended version of the `if` stateme
 
 There is an even more extended version of the `if` statement, which is useful to differentiate between more than two possible cases.  For instance, recall the example where the Body Mass Index was examined to determine if a player was obese, overweight, etc. In total, there were four possible cases, so let's suppose that we want to define a single variable called `bmi_outcome` to store this classification. E.g., the variable should have the value 0 for underweight players, 1 for normal weight, 2 for overweight, and 3 for obese. This variable can be set in Python as follows:
 
-{title="Selection with More Than Two Cases", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.8: Selection with More Than Two Cases", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 # bmi_outcome - 0 for underweight, 1 for normal, 2 for overweight, 3 for obese
 if bmi >= 30:
@@ -180,7 +177,7 @@ else:
 
 Notice that if `bmi` is 35, the first condition is true, so none of the other conditions is even tested. In particular, since the first condition is true, the variable `bmi_outcome` is set to `3`. Even though the second condition is also true (i.e, `bmi >= 25`), the value of `bmi_outcome` will **not** be set to `2`, since the relevant condition is not even tested. In reality, what the `elif` statements do is add the negation of the previous conditions, so the code above is equivalent to the following:
 
-{title="Explicit Selection with More Than Two Cases", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.9: Explicit Selection with More Than Two Cases", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 # bmi_outcome - 0 for underweight, 1 for normal, 2 for overweight, 3 for obese
 if bmi >= 30:
@@ -201,7 +198,7 @@ Iteration is the third of the main strategies that a computer can use to decide 
 
 The programming language feature that supports iteration is called a *loop*, and Python has a couple of different versions of loops.  The simplest is a `for` loop, which executes a statement a specific number of times. For example, the following loop executes the assignment statement precisely 10 times:
 
-{title="Simple For Loop", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.10: Simple For Loop", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 for i in range(10):
     x = i
@@ -213,14 +210,14 @@ Quick question: What is the value of `x` after the loop? It was assigned 0 the f
 
 Iteration is extremely important in programming, because we often have to compute a solution incrementally. For example, suppose we wish to find the sum of the first five positive integers. We can do so with the following statement:
 
-{title="Sum of First 5 Integers", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.11: Sum of First 5 Integers", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 sum5 = 1 + 2 + 3 + 4 + 5
 ~~~~~
 
 That works, but what about the sum of the first 100 integers? I certainly wouldn't want to write that expression, and even if I did, I would probably make an error somewhere, e.g., writing 633 instead of 63. But it is easy to find this value with a loop:
 
-{title="Sum of First 100 Positive Integers", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.12: Sum of First 100 Positive Integers", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 sum100 = 0              # sum100 - Sum of positive integers up to i
 for i in range(100):    # i - current integer to add
@@ -250,7 +247,7 @@ You can see what `range` does by expanding. In Python, you can type `list(range(
 
 Now that we understand what's happening, how can we fix it? As is often the case, there are several solutions. For example, you may have noticed that the numbers in `range(5)` are almost the ones we want, with the exception that each number is exactly one less than we want it to be. I.e., we have the numbers `[0, 1, 2, 3, 4]`, but we want `[1, 2, 3, 4, 5]`. This observation suggests a simple solution:
 
-{title="Sum of First 100 Positive Integers, Fix #1", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.13: Sum of First 100 Positive Integers, Fix #1", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 sum100 = 0              # sum100 - Sum of positive integers up to i
 for i in range(100):    # i - current integer to add
@@ -261,7 +258,7 @@ That will work, but I do not like it. The problem is that understanding Line 3 r
 
 Here is another solution:
 
-{title="Sum of First 100 Positive Integers, Fix #2", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.14: Sum of First 100 Positive Integers, Fix #2", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 sum100 = 100            # sum100 - Sum of positive integers up to i
 for i in range(100):    # i - current integer to add
@@ -272,7 +269,7 @@ I like this solution even less. Not only does it force you to remember that the 
 
 We can address that objection with this solution:
 
-{title="Sum of First 100 Positive Integers, Fix #3", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.15: Sum of First 100 Positive Integers, Fix #3", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 sum100 = 0              # sum100 - Sum of positive integers up to i
 for i in range(100):    # i - current integer to add
@@ -284,7 +281,7 @@ Again this works, but I do not like the solution. I have two problems with the s
 
 A more clever solution may be the following:
 
-{title="Sum of First 100 Positive Integers, Fix #4", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.16: Sum of First 100 Positive Integers, Fix #4", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 sum100 = 0              # sum100 - Sum of positive integers up to i
 for i in range(101):    # i - current integer to add
@@ -301,7 +298,7 @@ You may remember that `list(range(5))` returned the values `[0, 1, 2, 3, 4]`. Bu
 
 So my preferred solution is the following:
 
-{title="Sum of First 100 Positive Integers, Final Fix", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.17: Sum of First 100 Positive Integers, Final Fix", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 sum100 = 0              # sum100 - Sum of positive integers up to i
 for i in range(1, 101): # i - current integer to add
@@ -314,7 +311,7 @@ To further appreciate the power of iteration, consider a similar problem. What i
 
 One way is to modify the previous program. We'll consider each of the numbers 1, 2, 3, ..., up to 100, but we'll add it only when it's odd. And we can check for that in an `if` statement:
 
-{title="Sum of Odd Positive Integers Up To 100", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.18: Sum of Odd Positive Integers Up To 100", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 sum_odds_upto100 = 0    # sum_odds_upto100 - Sum of odd positive integers up to i
 for i in range(1, 101): # i - current integer to add
@@ -334,7 +331,7 @@ Instead, what I want to explore next is a *different* loop availabe in Python. T
 
 Python's `while` loop fills this gap very nicely. Instead of specifying how many times the loop should execute, a `while` loop lets you specify a condition that tests whether the loop should continue executing. That is, the loop stops when the condition becomes false. For instance, to find the sum of the first 100 odd positive integers, we can use a counter that keeps track of how many such integers we've found so far, and the loop exists when the condition `nodds < 100` becomes false:
 
-{title="Sum of First 100 Odd Positive Integers", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.19: Sum of First 100 Odd Positive Integers", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 n = 1                   # Current positive integer to consider
 nodds = 0               # Number of odd positive integers seen so far
@@ -354,7 +351,7 @@ So far, we have only discussed arithmetic and logical expressions. Now we'll swi
 
 A string is just a sequence of characters, and it must be quoted in Python. You can use either single quotes or double quotes, so these are both fine:
 
-{title="Example of Strings", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.20: Example of Strings", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 h = "hello"
 w = 'world'
@@ -366,7 +363,7 @@ What is the value of `"2" + "3"`? Some people think the answer should be `"5"`, 
 
 Another useful string operation allows you to select one of the letters in a word using square brackets. For example, if `h` is `"hello"`, then `h[1]` is the letter `"e"`. Remember that computer programmers like to start counting at 0, so the first letter (`'h'`) is `h[0]`, the second one `h[1]`, and so on. The valid *indexes* inside the square brackets are integers in the range 0 to {$$}n-1{/$$}, where {$$}n{/$$} is the length, or the number of characters in the string. In Python, you can compute the length of a string `h` with the expression `len(h)`. For example, the following short program counts the number of vowels in the string `s`:
 
-{title="Number of Vowels", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.21: Number of Vowels", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 # s - a string
 # nvowels - # of vowels from letter 0 up to but not including letter i of s
@@ -387,14 +384,14 @@ To do so, you must *construct* a string that contains some boilerplate text (`"T
 
 For example, the string above can be produced as follows:
 
-{title="Number of Vowels", lang=python, line-numbers=on, starting-line-number=8}
+{title="Listing 1.22: Number of Vowels", lang=python, line-numbers=on, starting-line-number=8}
 ~~~~~
 'There are {} vowels in the phrase "{}"'.format(nvowels, s)
 ~~~~~
 
 Actually, that doesn't quite do what we want. The result of the last line is to *compute* a string that has the information we want to show the user, but we haven't actually *displayed* that information to the user. Python supports several different ways of doing this, but for now we'll discuss just one. The Python built-in `print` is used to display a string at a console. If you are running Python from a command line, then the console is just the same window in which you are running Python. If you run Python from an IDE, like Canopy or Anaconda, then the IDE will display console output in a special window. Regardless of the specific mechanism, the effect of the statement `print("hello")` is to output `hello` (without the quotes) to the console. So what we really meant to write above is the following:
 
-{title="Number of Vowels", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 1.23: Number of Vowels", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 # s - a string
 # nvowels - # of vowels from letter 0 up to but not including letter i of s
