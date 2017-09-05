@@ -160,7 +160,7 @@ def sum_up_to(N):
     For efficiency, this function finds the sum of the first `N` numbers by 
     using Gauss's excellent formula for this sum:
 
-    --math:: \sum_{i=1}^{N}{i} = \frac{N(N+1)}{2}
+    .. math:: \sum_{i=1}^{N}{i} = \frac{N(N+1)}{2}
 
     Examples
     --------
@@ -180,14 +180,34 @@ def sum_up_to(N):
 
 Notice how each named section in Listing 2.7 is introduced by a heading followed by a line of "-" symbols. Notice also how the *Notes* section allows you to use mathematical equations. The equation is specified in LaTeX format, which is beyond the scope of this book. If you are planning on learning more about mathematics or computing, I recommend that you learn LaTeX, at least well enough to write simple documents. This [LaTeX tutorial](https://www.latex-tutorial.com) is a good place to start.
 
-You are probably feeling a little strange that Listing 2.7 contains 35 lines of documentation for only two lines of Python code. This is a bit extreme, because this specific function is so small, just one line of code. But it is not excessive. The primary goal is to write a function once but use it multiple times. The lines of Python are for the "write once" process, but the documentation is for the many times that we plan this function to be used. So it does make sense that the documentation is longer and that it may take even more time to write than the actual function. In fact, documentation is so important that I feel it warrants another *Rule of Style*:
+You are probably feeling a little confused (maybe even openly skeptical) that Listing 2.7 contains 35 lines of documentation for only two lines of Python code. This is a bit extreme, because this specific function is so small, just one line of code. But it is not excessive. The primary goal is to write a function once but use it multiple times. The lines of Python are for the "write once" process, but the documentation is for the many times that we plan this function to be used. So it does make sense that the documentation is longer and that it may take even more time to write than the actual function. In fact, documentation is so important that I feel it warrants another *Rule of Style*:
 
 >    *Rule of Style #3:* Each function should *always* be extensively documented using the `numpy` docstring convention.
 
+Before moving on, we have to address a very important topic. Let's say that you write the function `sum_up_to(N)` as above, and let's imagine that this function is used many times in the future. That's an ideal scenario, right? **But it's ideal only if the function actually works.**
 
+So how can we be sure that the function works? The very first step, of course, is that you should convince yourself that it actually works when you are writing the function. You do this by describing to yourself the way in which the function computes the value that the documentation says it does. I.e., you describe *how* the function does *what* it does. If you're lucky, you will have a partner that will be willing to listen to your explanation and try to help you spot any flaws. In return, you should be willing to do the same for him or her.
 
+But such informal arguments can only go so far. We are all very good at fooling ourselves. So a better way is to *test* the function by providing some input values and making sure the value returned is as expected. The more *test cases* you consider, the more certain you can be the the function works as advertised. At the very least, you should test several "common" cases and any "extreme" cases. E.g., the function may work for typical values of `N` but fail when `N` is negative or a very large positive number.
 
+In a later project, we will consider some very good testing frameworks for Python functions. For now, we'll rely on a very simple framework that will help you gain confidence that your function really does work. The idea is to look at the *Examples* section in the documentation and make sure that all of those examples really do work. In Listing 2.7, for example, we see that the value of `sum_up_to(4)` should be 10, so we can treat `sum_up_to(4)` as a test case.
+
+To make sure that all the examples work, all you have to do is invoke the Python framework `doctest`. You can do this with the following two lines of code, which should appear after *all* your function definitions:
+
+{title="Listing 2.8: Testing the Examples in the Docstring", lang=python, line-numbers=on, starting-line-number=38}
+~~~~~
+import doctest
+doctest.testmod()
+~~~~~
+
+Line 38 announces that your program needs to use the functions defined in the Python *module* called doctest. In this context, a module is simply a collection of functions, possibly written by somebody else. Line 39 then calls the function `testmod` in the `doctest` module. This function examines all of the functions defined in this file, and it executes each of the examples given in the docstrings. If all of the examples return the expected value, then `testmod` will simply finish executing without printing any messages or giving any other indication that it executed. On the other hand, if one or more of the examples returns unexpected values, `testmod` will print a summary of the offending function calls.
+
+I cannot overemphasize how important it is that we write functions that work correctly. A subtle error in a function that is used in multiple places can wreak havoc in a large program. And finding those errors is notoriously difficult, because it is often not obvious *where* the error may be. I.e., if `sum_up_to` is used in a planetarium program that predicts the position of the stars at a given date, a small error in `sum_up_to` may yield incorrect star positions. What's worse, the programmer of the planetarium program may spend most of her time figuring out what's wrong with the large and complicated part of the program, e.g., the ephemeris calculations, and effectively ignore the "easy" stuff. So debugging the error in `sum_up_to` will be much more difficult in the context of the planetarium program than it would have been in the context of *just* `sum_up_to` at the time it was written. This is so important that it brings up another *Rule of Style*: 
+
+>    *Rule of Style #4:* The docstring for each function should contain enough examples to reasonably ensure that the function works as expected. These examples should be tested *automatically*, e.g., with the module `testmod`.
 
 ## Lists in Python
 
 ## Simple Line Graphs with Matplotlib
+
+## An Aside on Efficiency
