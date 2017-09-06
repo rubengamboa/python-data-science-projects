@@ -296,6 +296,24 @@ This produces the following graph:
 
 ![Figure 2.2: X Squared](images/x-squared.png)
 
+The graph in Figure 2.2 does a good job of suggesting what {$$}y=x^2{/$$} looks like. However, it has a major flaw in that it does not label the axes at all, so a reader unfamiliar with the graph may not have a good idea of what it shows. We can remedy this with `plt.xlabel(...)`, `plt.ylabel(...)`, and `plt.title(...)` which specify labels for the axes and the graph as a whole. This is illustrated in Listing 2.14 and Figure 2.3.
+
+{title="Listing 2.14: Labels for Graphs", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import matplotlib.pyplot as plt
+
+xs = range(-5, 6)       # x-coordinates of points in graph
+ys = []                 # y-coordinates of points in graph (collected in loop)
+for x in xs:            # x-coordinate of current point
+    ys.append(x**2)
+plt.plot(xs, ys)
+plt.xlabel('X')
+plt.ylabel('Y = X**2')
+plt.title('Graph of X Squared')
+plt.show()
+~~~~~
+
+![Figure 2.3: Graph with Axes and Main Label](images/x-squared-labels.png)
 
 TODO: Introduce math module
 
