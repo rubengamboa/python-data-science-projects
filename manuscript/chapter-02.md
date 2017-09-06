@@ -208,6 +208,95 @@ I cannot overemphasize how important it is that we write functions that work cor
 
 ## Lists in Python
 
+We've seen how a Python variable can store a single number, logical value, or string that can be used in a computation. But sometimes we need to keep track of more than one value. In this project, for example, we may want to store the number of primes up to 100, 200, 300, etc. The Python mechanism for storing multiple values is called a *list*.
+
+Python lists are written using square brackets to enclose the elements in the list. The elements are separated by commas. For example, the following are Python lists:
+
+* `[1, 2, 3]`
+* `["a", "b", "abc"]`
+* `[1, "abc", False]`
+* `[[1], [1, 2, 3], [1, 2, 3, 4, 5]]`
+* `[]`
+
+Notice that lists can contain any type of element, including other lists. Also, a list may contain a mixture of elements, e.g., a string and a number, although it is more common for a list to contain elements of the same type.
+
+The number of elements in a list is called the *length* of the list, and it can be computed using the built-in Python function `len`, just like strings. So the expression `len([1, 2, 3])` is equal to three. The length of the list considers only the number of elements, so the length of the list `[[1], [1, 2, 3], [1, 2, 3, 4, 5]]` is also three. This list has only three elements, and it does not matter that, for example, the third element happens to be a list of length five.
+
+You can access the elements of a list using an index surrounded by square brackets. For instance, suppose that `x` has the list `["a", "b", "c"]`. Then the expression `x[1]` refers to the *second* element in the list, namely "b". Remember that (for historical reasons) computer programmers routinely start counting at 0 instead of 1, so the first element of `x` is in `x[0]`, not `x[1]`. We can use this to write some code that sums the elements of a list:
+
+{title="Listing 2.9: Adding Elements of a List", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+x = [10, 20, 30]    # A list of numbers
+sum = 0             # Sum of first i elements of list x
+for i in range(len(x)):
+    sum = sum + x[i]
+~~~~~
+
+Python makes this even easier by allowing you to loop over all the elements of the list without needing an explicit index variable `i`:
+
+{title="Listing 2.10: Adding Elements of a List", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+x = [10, 20, 30]    # A list of numbers
+sum = 0             # Sum of first i elements of list x
+for e in x:
+    sum = sum + e
+~~~~~
+
+Notice that in this version the loop variable `e` iterates over the actual *elements* in the list (10, 20, and 30) instead of over the *indexes* in the list (0, 1, and 2).
+
+Python lists also support negative indexes, which are interpreted as starting from the end of the list. For example, `x[-1]` is the last element of the list, `x[-2]` is the second to last element, and so on. Of course, you could also refer to the last element as `x[len(x)-1]`, but using negative indexes can be more natural.
+
+In some applications, it is useful to access more than one element of a list at a time. This is called *slicing* in Python. For example, suppose `x` contains the list `["a", "b", "c", "d", "e"]`. Then the expression `x[1:4]` refers to the elements with index 1, 2, and 3. In other words, `x[1:4]` is the list `["b", "c", "d"]`. Notice that, like `range`, Python slices start at the lower index and go up to but do not include the upper index. So `x[1:4]` does not include the element with index 4.
+
+If the lower or upper index in a Python slice is omitted, Python treats it as the beginning or end of the list, respectively. So `x[:3]` is the same as `x[0:3]` and `x[3:]` is the same as `x[3:5]` for a list with five elements.
+
+Do not confuse `x[2]`, `x[2:2]`, and `x[2:3]`. The first is a single element, so it's equal to `"c"` when `x` is `["a", "b", "c", "d", "e"]`. The second one refers to an empty list, since it contains the elements of `x` with index starting with 2 and ending but not including 2. Finally, the third is a list that contains just one element, so it's equal to `["c"]`. In particular, notice that `"c"` and `["c"]` are not the same. One is a string, and the other a list.
+
+List indexes, including slices, can be used to change the values in a list. For example, suppose `x` is equal to `["a", "b", "c", "d", "e"]`. After the statement `x[1] = "bat"` is executed, `x` will be equal to `["a", "bat", "c", "d", "e"]`. Moreover, if `x[2:4] = []` is executed, `x` will become `["a", "bat", "e"]`. And if this is followed by `x[1:2] = [1, 2, 3]`, `x` will become `["a", 1, 2, 3, "e"]`.
+
+Slices can be used to add elements to a list, not just replace elements in a list. For example, `x[2:2] = [1, 2, 4]` inserts the elements 1, 2, and 4 right after the second element in `x`. The key to remember is that the first element of `[1, 2, 4]` will be in position 2 after the assignment. Similarly, assuming again that `x` is equal to `["a", "b", "c", "d", "e"]`, executing `x[5:] = [1, 2, 4]` will add the elements 1, 2, and 4 at the end of the list, resulting in `["a", "b", "c", "d", "e", 1, 2, 4]`.
+
+It is more common, however, to use `append` to add an element to the end of a list. `x.append(4)` adds the number 4 to the end of the list `x`. For example, the following program will make `x` have the value `[10, 20, 30]`.
+
+{title="Listing 2.11: Collecting Elements in a List", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+x = []                # A list of positive integers up to 10*i
+for i in range(1,4):  # The next integer to add
+    x.append(10*i)
+~~~~~
+
 ## Simple Line Graphs with Matplotlib
+
+In order to finish the project, we need to construct basic line graphs. Luckily, Python includes an extensive yet simple-to-use module that can create many useful plots. In this section, we will scratch the surface of this module `matplotlib`, and we will be revisiting plot in future projects.
+
+To use the module `matplotlib`, you have to import it at the top of the file, just as we did previously with the module `doctest`. If you simply import `matplotlib`, then you will need to use the entire name `matplotlib` everywhere it's used. That's a long name, so Python programmers routinely rename the module as just `plt`:
+
+{title="Listing 2.12: Importing Matplotlib", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import matplotlib.pyplot as plt
+~~~~~
+
+The most basic line graph plots a single function of `x`. To do this, you need to collect the x and y coordinates of many points, and then pass those lists to the function `plt.plot(xs, ys)`. Note that the x and y coordinates are collected in separate lists. After calling `plt.plot(...)`, you must call `plt.show()` to create and display the graph.
+
+For example, the following program creates a graph of the function {$$}y=x^2{/$$}.
+
+{title="Listing 2.13: Plotting x squared", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import matplotlib.pyplot as plt
+
+xs = range(-5, 6)       # x-coordinates of points in graph
+ys = []                 # y-coordinates of points in graph (collected in loop)
+for x in xs:            # x-coordinate of current point
+    ys.append(x**2)
+plt.plot(xs, ys)
+plt.show()
+~~~~~
+
+This produces the following graph:
+
+![Figure 2.2: X Squared](images/x-squared.png)
+
+
+TODO: Introduce math module
 
 ## An Aside on Efficiency
