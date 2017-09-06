@@ -315,6 +315,75 @@ plt.show()
 
 ![Figure 2.3: Graph with Axes and Main Label](images/x-squared-labels.png)
 
-TODO: Introduce math module
+Matplotlib also allows you to plot more than one function in the same graph. This can be very useful when you're trying to compare different functions qualitatively. To do this, simply collect more than one set of y-coordinates and use multiple calls of `plt.plot(...)`. For example, you can plot both {$$}x^2{/$$} and {$$}x^3{/$$} as shows in Listing 2.14.
+
+{title="Listing 2.15: Multiple Functions in a Graph", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import matplotlib.pyplot as plt
+
+xs = range(-5, 6)       # x-coordinates of points in graph
+ys2 = []                # y-coordinates of x**2 in graph (collected in loop)
+ys3 = []                # y-coordinates of x**3 / 5 in graph (collected in loop)
+for x in xs:            # x-coordinate of current point
+    ys2.append(x**2)
+    ys3.append(x**3 / 5)
+plt.plot(xs, ys2)
+plt.plot(xs, ys3)
+plt.xlabel('X')
+plt.ylabel('Y = X**2 & X**3 / 5')
+plt.title('Graph of X Squared and X Cubed Scaled')
+plt.show()
+~~~~~
+
+![Figure 2.4: Multiple Functions in the Same Graph](images/multiple-functions-in-graph.png)
+
+As Figure 2.4 shows, however, the results are not perfect, because it is not obvious which is the graph of which function. To address this, we can add a legend to the graph, by adding legend text to each invocation of `plt.plot(...)` and calling `plt.legend(...)` to create the actual legend. Listing 2.16 and Figure 2.5 illustrate this approach.
+
+{title="Listing 2.16: Multiple Functions in a Graph with a Legend", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import matplotlib.pyplot as plt
+
+xs = range(-5, 6)       # x-coordinates of points in graph
+ys2 = []                # y-coordinates of x**2 in graph (collected in loop)
+ys3 = []                # y-coordinates of x**3 / 5 in graph (collected in loop)
+for x in xs:            # x-coordinate of current point
+    ys2.append(x**2)
+    ys3.append(x**3 / 5)
+plt.plot(xs, ys2, label="X**2")
+plt.plot(xs, ys3, label="X**3 / 5")
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Graph of X Squared and X Cubed Scaled')
+plt.legend(loc="upper right")
+plt.show()
+~~~~~
+
+![Figure 2.5: Multiple Functions in the Same Graph with Legend](images/multiple-functions-in-graph-legend.png)
+
+This has been a very quick introduction to matplotlib, but you have already seen enough to produce some great graphs, and certainly enough to complete this project. 
+
+There's just one missing part. You now know how to graph different functions of `x` on the same graph, and you can build graphs that have arithmetic expressions, like {$$}y = x^2{/$$}. But how can you plot more complicated mathematical function, like {$$}y = \ln(x){/$$} or even {$$}y = \sin(x){/$$}?
+
+The answer is that you need to use the Python `math` module, which implements functions that calculate many common mathematical functions. As with `doctest` and `matplotlib`, the first step is to *import* the module at the top of your file, and then you can use functions such as `math.log(...)` and `math.sin(...)`, as well as constants such as `math.pi`. Note that `math.log(...)` computes the natural log of its argument, so `math.log(x)` computes {$$}\ln(x){/$$}. 
+Listing 2.17 shows how you may use the `math` library to compute a more complex graph.
+
+{title="Listing 2.17: Parametric Curve", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import matplotlib.pyplot as plt
+import math
+
+xs = []                 # x-coordinates of points in graph (collected in loop)
+ys = []                 # y-coordinates of points in graph (collected in loop)
+for t in range(0, 2*31416+1): # parameter value of current point
+    xs.append(math.sin(3*t/10000.0 + math.pi/2))
+    ys.append(math.sin(t/10000.0))
+plt.plot(xs, ys)
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Lissajous Curve')
+plt.show()
+~~~~~
+
+![Figure 2.6: Parametric Curve](images/lissajous-curve.png)
 
 ## An Aside on Efficiency
