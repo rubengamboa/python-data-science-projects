@@ -387,3 +387,31 @@ plt.show()
 ![Figure 2.6: Parametric Curve](images/lissajous-curve.png)
 
 ## An Aside on Efficiency
+
+You may have found that your solution to this project works correctly, but that it takes a very long time to run, particularly if you're trying to plot the number of primes up to, say 1,000,000. This a hard problem to solve because there aren't any good and efficient ways to check if a number is prime, so this program is bound to take some time.
+
+However, some of the design decisions we made along the way can exacerbate the problem. For example, the goal is to graph the function {$$}np(n){/$$} that counts the number of primes up to {$$}n{/$$}. To do this, we need to collect many values of {$$}np(n){/$$} in a Python list, so it makes sense to create a Python function called `nprimes_up_to(n)`. In turn, this function will test many numbers to see if they're prime, so it also makes sense to turn the primality checking function into its own function called `is_prime(n)`.
+
+Let's think about `is_prime(n)` first. The solution I used was to check whether each of the numbers 2, 3, ..., up to `n-1` are factors of n. If any of those divide `n` evenly, then `n` is not a prime. This approach is reasonable when `n` is 100, say, but it's too slow when `n` is on the order of 1,000,000. The good news is that there are at least two gross inefficiencies in this approach that are easy to solve. First of all, suppose we discover that 2 divides `n`. At this point, it is no longer necessary to consider 3, 4, ..., and so on! This should speed up the code by *at least* a factor of 2, since all even numbers will be dealt with quickly. Moreover, even if `n` is a prime so it has no factors, there is no need to consider all the numbers from 2 up to `n-1`. The truth is that we can stop as soon as we find a number `k` such that `k*k > n`. After all, if none of the numbers up to `k` are factors of `n`, then the product of any two numbers that are greater than `k` will necessarily be larger than `n` so there's no point in considering them.
+
+We can take advantage of these two ideas by changing the code inside the function `is_prime(n)`. The simplest way to do so is to change the `for` loop in this function to a `while` loop that considers both of these ideas in order to exit the loop as early as possible. What's great about this is that the rest of the program can be completely unchanged! We simply speed up the computation of `is_prime(n)`, but other parts of the program simply continue to call this function, reaping the benefit of the speed-up without having to make any changes at all.
+
+There is a slight drawback, however. We started with a version of `is_prime(n)` that was slow, but at least we knew that it worked correctly. How can we be sure that it still works after making these changes? To solve this conundrum, remember that we use test cases to gain confidence in the code. The test cases should be written in the docstring for the function, and the docstring did not change, since the function is still computing the *same* values. So we can simply run `doctest.testmod()` to make sure that the function still works.
+
+What about the other opportunity for speeding up the code? The function `nprimes_up_to(n)` computes the number of primes up to `n`. But think about what happens when we call `nprimes_up_to(100)` and then `nprimes_up_to(200)`. In the second call we essentially repeate *all* the work that we did in the first. Of course, we don't need to do that in reality.
+
+Unfortunately, fixing this takes a little more work. What needs to happen is that the function that collects the values of `nprimes_up_to(n)` needs to do so incrementally. That means that it can remember the result of `nprimes_up_to(100)`, then it needs to use that to help compute `nprimes_up_to(200)`. In practice, that means that we need to *rethink* the arguments to `nprimes_up_to(n)`. It turns out that a function called `nprimes_in_range(from_n, n)` is more useful. Listing 2.18 shows you how the number of primes can be collected.
+
+{title="Listing 2.18: Speeding Up the Count of Primes", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+nprimes = 0     # Number of primes up to N
+from_n = 1      # Lower bound for # of primes in range from_n to N
+for n in range(0, 10000000, 10000): # Current upper bound to check for # primes
+    nprimes = nprimes + nprimes_in_range(from_n, n)
+    from_n = n + 1
+    # ...
+~~~~~
+
+You should be able to convince yourself that using `nprimes_in_range(...)` will give the right result, provided that the function looks for primes including both the lower and upper bound. This change will significantly speed up the code, but not without a significant cost, because it changes not just the function definition, but also the way that it is called. Thus the changes are not isolated, but may affect many pieces of code throughout the program. That's the price we have to pay some times to have efficient code.
+
+Before ending this section, I want to emphasize that efficiency is not the only quality, not even the main quality, of great software. Most of the time, it is more important to write simple, direct code that is easy to understand, because such code is much more likely to be *right*. But in those cases where the program is unacceptably slow, you can always rethink part of your program to make it substantially faster.
