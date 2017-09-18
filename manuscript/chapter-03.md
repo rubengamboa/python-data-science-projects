@@ -106,10 +106,16 @@ A> Looking at Listing 3.5, you may think that zero is a particularly bad value t
 A large part of this project involves counting the occurrence of letter pairs in a document. The counts themselves can be stored in a Python dictionary, so that, for example, `_PAIR_COUNTS["th"]` is the number of times that `"th"` is encountered in the document. The counts themselves will later be processed to compute the frequencies of the different pairs, so that we know, for example, that `"th"` occurs 2.4% of the time.
 
 In particular, we have the Python dictionary `_PAIR_COUNTS` and three different operations:
+
 1. initializing `_PAIR_COUNTS` to zeros,
 2. adding the counts for pairs of letters in a given string, and
 3. computing the final frequencies.
+
 Moreover, the dictionary `_PAIR_COUNTS` is crucial for those three operations, but it is really not relevant anywhere else. And as a matter of style, it is downright dangerous to allow other pieces of your program to access `_PAIR_COUNTS` directly, because those pieces may be unaware of subtleties in the use of `_PAIR_COUNTS`. This may sound paranoid, but paranoia is a good habit to develop in writing code. Things *do* go wrong.
+
+So the best practice is to organize this code in order to "hide" the dictionary `_PAIR_COUNTS` and let the rest of the program use only three functions corresponding to the three operations above. For instance, you can write the functions `initialize_counts()`, `count_pairs(s)`, and `get_all_frequencies()` that perform the operations above, and no other part of the program is allowed to use the dictionary `_PAIR_COUNTS` directly.
+
+This is an example of an important technique in computing called *encapsulation*. The key idea in encapsulation is that access to some central data is controlled via a group of functions. This simplifies large programs, because most of the program does not need to know or care about the implementation of those functions, only their behavior. In a sense, this is a similar argument to defining functions, but instead of encapsulating a single function, the key idea is to encapsulate a group of related functions and possibly some central data at once.
 
 ## Reading and Writing Text Files
 
