@@ -103,6 +103,14 @@ A> Looking at Listing 3.5, you may think that zero is a particularly bad value t
 
 ## Global Variables and Program Organization
 
+A large part of this project involves counting the occurrence of letter pairs in a document. The counts themselves can be stored in a Python dictionary, so that, for example, `_PAIR_COUNTS["th"]` is the number of times that `"th"` is encountered in the document. The counts themselves will later be processed to compute the frequencies of the different pairs, so that we know, for example, that `"th"` occurs 2.4% of the time.
+
+In particular, we have the Python dictionary `_PAIR_COUNTS` and three different operations:
+1. initializing `_PAIR_COUNTS` to zeros,
+2. adding the counts for pairs of letters in a given string, and
+3. computing the final frequencies.
+Moreover, the dictionary `_PAIR_COUNTS` is crucial for those three operations, but it is really not relevant anywhere else. And as a matter of style, it is downright dangerous to allow other pieces of your program to access `_PAIR_COUNTS` directly, because those pieces may be unaware of subtleties in the use of `_PAIR_COUNTS`. This may sound paranoid, but paranoia is a good habit to develop in writing code. Things *do* go wrong.
+
 ## Reading and Writing Text Files
 
 ## JSON
