@@ -55,7 +55,7 @@ Once it is defined, you can use the function `sum_up_to` just like any of the bu
 
 {title="Listing 2.2: Sum of First 100 Positive Integers", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
-sum100 = sum_up_to(N)     # sum100 - Sum of positive integers up to 100
+sum100 = sum_up_to(100)   # sum100 - Sum of positive integers up to 100
 ~~~~~
 
 Let's emphasize one of the benefits of using functions. The code in Listing 2.1 is relatively simple, but it is not the fastest way to compute the value of {$$}1 + 2 + \cdots + N{/$$}. A much faster way to compute this sum was discovered by the great mathematician Gauss, who found that {$$}1 + 2 + \cdots + N = \frac{N(N+1)}{2}{/$$}. Using Gauss's trick, we can define a more efficient version of `sum_up_to` as follows:

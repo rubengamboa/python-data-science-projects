@@ -111,13 +111,122 @@ In particular, we have the Python dictionary `_PAIR_COUNTS` and three different 
 2. adding the counts for pairs of letters in a given string, and
 3. computing the final frequencies.
 
-Moreover, the dictionary `_PAIR_COUNTS` is crucial for those three operations, but it is really not relevant anywhere else. And as a matter of style, it is downright dangerous to allow other pieces of your program to access `_PAIR_COUNTS` directly, because those pieces may be unaware of subtleties in the use of `_PAIR_COUNTS`. This may sound paranoid, but paranoia is a good habit to develop in writing code. Things *do* go wrong.
+Moreover, the dictionary `_PAIR_COUNTS` is crucial for those three operations, but it is really not relevant anywhere else. And as a matter of style, it is downright dangerous to allow other pieces of your program to access `_PAIR_COUNTS` directly, because those pieces may be unaware of subtleties in the use of `_PAIR_COUNTS`. This may sound paranoid, but paranoia is a good habit to develop in writing code. Things *do* go wrong, and our only recourse is to write programs that are easy to think about and *fix*.
 
-So the best practice is to organize this code in order to "hide" the dictionary `_PAIR_COUNTS` and let the rest of the program use only three functions corresponding to the three operations above. For instance, you can write the functions `initialize_counts()`, `count_pairs(s)`, and `get_all_frequencies()` that perform the operations above, and no other part of the program is allowed to use the dictionary `_PAIR_COUNTS` directly.
+So the best practice is to organize this code in order to "hide" the dictionary `_PAIR_COUNTS` and let the rest of the program use only three functions corresponding to the three operations above. For instance, you can write the functions `initialize_counts()`, `count_pairs(s)`, and `get_all_frequencies()` that perform the operations above, and no other part of the program is allowed to use the dictionary `_PAIR_COUNTS` directly. This has two main benefits. First, it isolates the part of the program that works with the dictionary, so that if anything is wrong there, you know exactly where to look. Second, it means that the remaining parts of the program do not need to be aware of details in the way the dictionary stores information, so they can be simpler to code.
 
-This is an example of an important technique in computing called *encapsulation*. The key idea in encapsulation is that access to some central data is controlled via a group of functions. This simplifies large programs, because most of the program does not need to know or care about the implementation of those functions, only their behavior. In a sense, this is a similar argument to defining functions, but instead of encapsulating a single function, the key idea is to encapsulate a group of related functions and possibly some central data at once.
+This is an example of an important technique in computing called *encapsulation*. The key idea in encapsulation is that access to some central data is controlled via a group of functions. This simplifies large programs, because most of the program does not need to know or care about the implementation of those functions, only their behavior. In a sense, this is a similar argument to defining functions, but instead of encapsulating a single function, the key idea is to encapsulate a group of related functions and possibly some central data all at once.
+
+In order to do this, it is necessary to use *global variables*, that is variables that are accessible from multiple functions[^oop]. In the example above, `_PAIR_COUNTS` is a global variable that is accessible to the three functions `initialize_counts()`, `count_pairs(s)`, and `get_all_frequencies()`. This is done simply by setting the global variables outside of the functions, as shown in Listing 3.6.
+
+[^oop]: In a later project, we will see a different approach to encapsulation which is superior because it completely avoids the use of these global variables. I.e., just because other parts of the program do not need to access the global variables does not mean that they won't! But using object-orientation, the encapsulation can be much stronger, effectively preventing other parts of the code from interfering (deliberately or accidentally) with the workings of the related functions that are encapsulated.
+
+{title="Listing 3.6: Declaring a Global Variable", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+_PAIR_COUNTS = {}
+
+def initialize_counts():
+    ...
+
+def count_pairs(s):
+    ...
+
+def get_all_frequencies():
+    ...
+~~~~~
+
+Recall that if two functions use the same variable name, they are actually referring to two different variables. Such variables are called *local variables*. But since `_PAIR_COUNTS` appears before any of the functions are defined, all three of them will actually refer to the same variable `_PAIR_COUNTS`. I.e., all of them will see the same Python dictionary, which happens to be empty in Listing 3.6.
+
+Global variables are usually (always?) dangerous, because if one function makes a change to a global variable, that may cause seemingly inexplicable changes in a different function. Python partially addresses this concern by essentially disallowing inadvertent changes to global variables. For example, `initialize_counts()` should change the dictionary `_PAIR_COUNTS` by setting all its entries to zero (or better to one, as discussed previously). But if it simply makes these changes, the other two functions will not see the change. What happens is that the changes are made to a *copy* of `_PAIR_COUNTS` and then discarded after `initialize_counts()` finishes executing. In order to make the changes visible to other functions, Python requires that the function explicitly declare its intent to change the variable using the `global` keyword. This is seen in Listing 3.7.
+
+{title="Listing 3.7: Changing a Global Variable", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+_PAIR_COUNTS = {}
+
+def initialize_counts():
+    global _PAIR_COUNTS
+    ...
+
+def count_pairs(s):
+    global _PAIR_COUNTS
+    ...
+
+def get_all_frequencies():
+    ...
+~~~~~
+
+Notice in Listing 3.7 that both `initialize_counts()` and `count_pairs(s)` explicitly declare that `_PAIR_COUNTS` is a `global` variable, so they can make changes to it that will be visible in all other functions. This makes sense, since both of these functions are designed to alter the entries in `_PAIR_COUNTS`. On the other hand, `get_all_frequencies()` does not declare `_PAIR_COUNTS` as a `global` variable, so it cannot make any changes to its value. Again, this makes sense, because `get_all_frequencies()` is intended to retrieve the information in `_PAIR_COUNTS` but it does not need to, so it *should not*, change those counts.
 
 ## Reading and Writing Text Files
+
+Another key component of this project is to read the large input data file "training-set.txt". Python has some mechanisms for reading text files, and we'll discuss one of the simplest in this section.
+
+A text file is made up of many lines by an end-of-line marker, which can be either a carriage return (CR) followed by a newline (NL) or a single newline, depending on your operating system. In Python, carriage return is written as `"\r"` and newline as `"\n"`, so for example the string `"fred\nsally"` consists of two lines, one with `"fred"` on it, and the next one with '"sally"'. Note that "\n" refers to only *one* character, not two. It is the single character *NL* (or newline), not the characters *backslash* followed by the character *n*.
+
+W> In this section, we are discussing one of Python's mechanisms for reading  *text files*, which are especially simple. 
+
+ However, text files do not contain any formatting or images, so it is impossible to italicize some words or to make other words bolded, and there is also no way to include a figure inside a text file. In particular, files formatted with *Microsoft Word* are **not** text files, and neither are spreadsheets, image files, or movies. The methods we describe in this section cannot be used to read those files.
+
+For concreteness, let's say that there is a file called "poem.txt" that has the following lines from Coleridge's *Kubla Khan*:
+
+{style=poem}
+~~~~~~
+In Xanadu did Kubla Khan
+A stately pleasure-dome decree:
+Where Alph, the sacred river, ran
+Through caverns measureless to man
+  Down to a sunless sea.
+~~~~~~
+
+To read this file in Python, you must perform essentially three tasks:
+
+1. **open** the file, which makes it available for reading,
+2. **read** each of the lines in the file, and
+3. **close** the file to let Python know that you are finished with it.
+
+Forgetting to close the file is an extremely common error, so Python provides the `with` statement, an excellent control block that closes the file *automatically*. This is seen in Listing 3.8.
+
+{title="Listing 3.8: Reading a File", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+with open("poem.txt", "r") as f:
+    contents = f.read()
+# File is automatically closed after the "with" block
+~~~~~
+
+The `open()` functions takes care of step 1, and it tells Python that we intend to read from this file. In particular the second argument, `"r"`, is what tells python that we intend to *r*ead from the file. If Python cannot find the file "poem.txt", it will immediately stop and report an error. Make sure the file is where you are asking Python to find it; you may have to give a full path name, such as `"C:/Users/ruben/poem.txt"`[^baskslashes] or `"/Users/ruben/poem.txt"`.
+
+[^backslashes]: You may be wondering why we used forward slashes in `"C:/Users/ruben/poem.txt"` instead of backward slashes as in `"C:\Users\ruben\poem.txt"`. The reason is that backward slashes have special meaning in Python, such as `"\n"` for newline or `"\r"` for carriage return. So if you need to include a backslash in a string, you actually have to specify two backslashes. We could have said `"C:\\Users\\ruben\\poem.txt"`, and that would be correct. But we decided to use forward slashes, since Python will accept either to separate directory or folder names in a file name.
+
+If Python finds the file, then it will make it available to the remainder of your program through the new variable `f`, which is named at the end of the `with` statement in Line 1. That's what we mean by "opening" a file, just making it accessible to the rest of the program can read it. This is done in Line 2 with the expression `f.read()` which reads the entire contents of the file, including the special carriage returns and end-of-line symbols, into the variable `contents`. After the `with` statement, i.e., just before Line 3, Python will automatically `close` the file, which means that you can no longer read from it in the program. That's the great advantage of the `with` statement, that it closes the file automatically so you don't have to remember to do so.
+
+The `f.read()` expression reads the entire contents of the file, but it's more common to read the file one line at a time. This can be done by using a `for` loop to iterate through the file, as seen in Listing 3.9.
+
+{title="Listing 3.9: Reading a File One Line at a Time", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+with open("poem.txt", "r") as f:
+    for line in f:
+        print (len(line))
+~~~~~
+
+The `for` loop in Line 2 will iterate over the lines in the text file "poem.txt", so it will execute five times, the first time setting `line` to `"In Xanadu did Kubla Khan"`, the second to `"A stately pleasure-dome decree:"`, and so on. The `print` statement in Line 3 will print the length of each line, so you will see the numbers 25, 32, etc.
+
+Wait a minute! If you count the characters in `"In Xanadu did Kubla Khan"`, you will see 24 characters, not 25. Where's the extra character coming from?
+
+If you answered "It's the newline character," you absolutely figured out how to read text files in Python. What the `for` actually does is to set the variable `line` to `"In Xanadu did Kubla Khan\n"`, then to `"A stately pleasure-dome decree:\n"`, and so on. Do not forget those newlines!
+
+Unfortunately, those newlines are typically useless, so Python programmers generally remove them. This can be done with the function `rstrip()` as seen in Listing 3.10.
+
+{title="Listing 3.10: Reading a File One Line at a Time without Newlines", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+with open("poem.txt", "r") as f:
+    for raw_line in f:
+        line = raw_line.rstrip()
+        print (len(line))
+~~~~~
+
+The call to `raw_line.rstrip()` removes any *whitespace* at the end of `raw_line`. "Whitespace" refers to all those unprintable characters that are meant to separate words of text, such as spaces, tabs, carriage returns, and newlines. The first "r" in `rstrip()` refers to the *right* side of the string, or its end. You can also remove whitespace characters from the front or *left* side of the string with `lstrip()`, and from both the left and the right of the string with `strip()`. 
+
+In some cases, you will want to remove some whitespace characters from the end of the string, but not all. For example, you may want to remove carriage returns and newlines, but not spaces or tabs. The `rstrip()` function lets you specify which characters to remove, so you can say `raw_line.rstrip("\r\n")` for example. Notice that the call to `rstrip("\r\n")` specifies both carriage returns and newlines, so both will be removed. If the line has only newlines, those will be removed. So using `rstrip("\r\n")` works both under Microsoft Windows, which uses a carriage return followed by a newline to terminate lines, and under Linux, which uses a single newline to terminate lines.
 
 ## JSON
 
