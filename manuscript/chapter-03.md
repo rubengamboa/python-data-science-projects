@@ -241,8 +241,48 @@ Notice how each line written to the output file ends in a newline. You may be co
 
 Up to this point, we have been building projects that do all of their own work. But this project calculates the frequency of letter pairs, and those frequencies will be used in the next project. So now we have to discuss how one program can produce an output that another program can read.
 
-There have been many different solutions to this problem in the history of computing. A solution that is favored by many programmers is to use JSON, which is a text notation for representing numbers, strings, lists, and dictionaries. I.e., JSON can store the types of Python objects that we have used so far, store them in a text file, and retrieve them from a text file. Although we will not take advantage of this feature in any of our projects, JSON is also an attractive solution because it can be used in almost any programming language. For example, it was originally developed in JavaScript, and JSON stands for "**J**ava**S**cript **O**bject **N**otation", but you can read and write JSON in Python, Java, C#, etc.
+There have been many different solutions to this problem in the history of computing. A solution that is favored by many programmers is to use JSON, which is a text notation for representing numbers, strings, lists, and dictionaries. I.e., JSON can store the types of Python objects that we have used so far, store them in a text file, and retrieve them from a text file. Although we will not take advantage of this feature in any of our projects, JSON is also an attractive solution because it can be used in almost any programming language. For example, it was originally developed in JavaScript, and in fact JSON stands for "**J**ava**S**cript **O**bject **N**otation", but you can read and write JSON in Python, Java, C#, etc.
 
+Writing a JSON file is trivial in Python.  First you need to `import` the module `json`, then you can call `json.dumps(object, file)` to write the Python object `object` to the file `file`, which should be open for writing. This is shown in Listing 3.12.
 
+{title="Listing 3.12: Writing to a File", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import json
+
+population = { "Alabama":4.863, ..., "Wyoming":0.586 }
+with open("output.json", "w") as f:
+    json.dumps(population, f)
+~~~~~
+
+To read the dictionary from the file, use the function `json.load(f)` where `f` is a file that is opened for reading. This is shown in Listing 3.13.
+
+{title="Listing 3.13: Writing to a File", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import json
+
+with open("output.json", "r") as f:
+    population = json.load(f)
+~~~~~
+
+After the code in Listing 3.13 the variable `population` will have whatever was previously dumped in the file `"output.json"`. If it is executed after the program in Listing 3.12, `population` will have the dictionary created in Line 3 and saved as JSON in Line 5 of Listing 3.12. In other words, `population["Alabama"]` will be `4.863`, and so on.
 
 ## Creating Word Clouds
+
+The last portion of this project is to create a word cloud that illustrates the letter pair frequencies. A word cloud is a diagram that depicts each word, where the size of each word represents the frequency of the word. Creating word clouds from scratch is quite challenging, but one of the great things about Python is that many contributors write useful modules and make them available through the internet.
+
+Luckily for us, Andreas Mueller wrote an excellent module to create word clouds in Python using matplotlib. You can find installation and usage instructions in <https://github.com/amueller/word_cloud>.
+Once you have the package installed, you can generate a word cloud using code similar to the one in Listing 3.14.
+
+{title="Listing 3.14: Creating a Word Cloud", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import matplotlib.pyplot as plt
+import wordcloud as wc
+
+freqs = {"cat": 0.5, "dog":0.4, "fish":0.1}
+wcloud = wc.WordCloud().generate_from_frequencies(freqs)
+plt.imshow(wcloud)
+plt.axis("off")
+plt.show()
+~~~~~
+
+The important line is Line 5 which creates the word cloud image. The `freqs` is a Python dictionary, where the keys are the words and the values are the probabilities or frequencies of each word. This is exactly the format that should be produced by the function `get_all_frequencies()`. The last three lines in Listing 3.14 use matplotlib to display the image created by the word cloud module.  Line 6 actually draws the image, and Line 8 displays the matplotlib window. Line 7 turns off the default matplotlib x and y axes, since we are displaying an image, and not building a graph.
