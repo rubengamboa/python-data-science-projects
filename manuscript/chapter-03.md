@@ -163,19 +163,17 @@ Another key component of this project is to read the large input data file "trai
 
 A text file is made up of many lines by an end-of-line marker, which can be either a carriage return (CR) followed by a newline (NL) or a single newline, depending on your operating system. In Python, carriage return is written as `"\r"` and newline as `"\n"`, so for example the string `"fred\nsally"` consists of two lines, one with `"fred"` on it, and the next one with '"sally"'. Note that "\n" refers to only *one* character, not two. It is the single character *NL* (or newline), not the characters *backslash* followed by the character *n*.
 
-W> In this section, we are discussing one of Python's mechanisms for reading  *text files*, which are especially simple. 
-
- However, text files do not contain any formatting or images, so it is impossible to italicize some words or to make other words bolded, and there is also no way to include a figure inside a text file. In particular, files formatted with *Microsoft Word* are **not** text files, and neither are spreadsheets, image files, or movies. The methods we describe in this section cannot be used to read those files.
+W> In this section, we are discussing one of Python's mechanisms for reading  *text files*, which are especially simple. However, text files do not contain any formatting or images, so it is impossible to italicize some words or to make other words bold, and there is also no way to include a figure inside a text file. In particular, files formatted with *Microsoft Word* are **not** text files, and neither are spreadsheets, image files, audio files, or movies. The methods we describe in this section cannot be used to read those files.
 
 For concreteness, let's say that there is a file called "poem.txt" that has the following lines from Coleridge's *Kubla Khan*:
 
 {style=poem}
 ~~~~~~
-In Xanadu did Kubla Khan
-A stately pleasure-dome decree:
-Where Alph, the sacred river, ran
-Through caverns measureless to man
-  Down to a sunless sea.
+    In Xanadu did Kubla Khan
+    A stately pleasure-dome decree:
+    Where Alph, the sacred river, ran
+    Through caverns measureless to man
+      Down to a sunless sea.
 ~~~~~~
 
 To read this file in Python, you must perform essentially three tasks:
@@ -227,6 +225,8 @@ with open("poem.txt", "r") as f:
 The call to `raw_line.rstrip()` removes any *whitespace* at the end of `raw_line`. "Whitespace" refers to all those unprintable characters that are meant to separate words of text, such as spaces, tabs, carriage returns, and newlines. The first "r" in `rstrip()` refers to the *right* side of the string, or its end. You can also remove whitespace characters from the front or *left* side of the string with `lstrip()`, and from both the left and the right of the string with `strip()`. 
 
 In some cases, you will want to remove some whitespace characters from the end of the string, but not all. For example, you may want to remove carriage returns and newlines, but not spaces or tabs. The `rstrip()` function lets you specify which characters to remove, so you can say `raw_line.rstrip("\r\n")` for example. Notice that the call to `rstrip("\r\n")` specifies both carriage returns and newlines, so both will be removed. If the line has only newlines, those will be removed. So using `rstrip("\r\n")` works both under Microsoft Windows, which uses a carriage return followed by a newline to terminate lines, and under Linux, which uses a single newline to terminate lines.
+
+
 
 ## JSON
 
