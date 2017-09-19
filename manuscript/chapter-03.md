@@ -226,8 +226,23 @@ The call to `raw_line.rstrip()` removes any *whitespace* at the end of `raw_line
 
 In some cases, you will want to remove some whitespace characters from the end of the string, but not all. For example, you may want to remove carriage returns and newlines, but not spaces or tabs. The `rstrip()` function lets you specify which characters to remove, so you can say `raw_line.rstrip("\r\n")` for example. Notice that the call to `rstrip("\r\n")` specifies both carriage returns and newlines, so both will be removed. If the line has only newlines, those will be removed. So using `rstrip("\r\n")` works both under Microsoft Windows, which uses a carriage return followed by a newline to terminate lines, and under Linux, which uses a single newline to terminate lines.
 
+To write text to a file, you need to open the file in write mode (i.e., `"w"` instead of `"r"` in the call to `open()`), then you can use the `write()` function. You should explicitly include newlines, so if `f` is a file that is open for writing, you can say `f.write("hello\n")` to write a new line with just the string `"hello"` on it. You can call `f.write()` as many times as you need. It is very common, for example, to write the file one line at a time, as seen in Listing 3.11.
 
+{title="Listing 3.11: Writing to a File", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+with open("output.txt", "w") as f:
+    for i in range(10):
+        f.write("line {}\n".format(i))
+~~~~~
+
+Notice how each line written to the output file ends in a newline. You may be concerned that this will not work properly under Microsoft Windows, since it uses a carriage return followed by a newline to separate lines. However, this is one place that Python betrays its origins in Unix systems. It simply allows you to use newlines to separate lines, and it converts the newlines to whatever convention is used in the operating system where it is running. In other words, you can simply use `"\n"` when writing, and Python will output a single newline in Linux and Mac systems, and a carriage return followed by a newline in Microsoft systems. In other words, just use `"\n"` and Python will do the Right Thing.
 
 ## JSON
+
+Up to this point, we have been building projects that do all of their own work. But this project calculates the frequency of letter pairs, and those frequencies will be used in the next project. So now we have to discuss how one program can produce an output that another program can read.
+
+There have been many different solutions to this problem in the history of computing. A solution that is favored by many programmers is to use JSON, which is a text notation for representing numbers, strings, lists, and dictionaries. I.e., JSON can store the types of Python objects that we have used so far, store them in a text file, and retrieve them from a text file. Although we will not take advantage of this feature in any of our projects, JSON is also an attractive solution because it can be used in almost any programming language. For example, it was originally developed in JavaScript, and JSON stands for ***J**ava**S**cript **O**bject **N**otation*, but you can read and write JSON in Python, Java, C#, etc.
+
+
 
 ## Creating Word Clouds
