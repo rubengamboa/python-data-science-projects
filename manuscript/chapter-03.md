@@ -82,6 +82,7 @@ Iterating over the items in a dictionary is so common that Python provides a con
 {title="Listing 3.4: Iterating Implicitly over a Dictionary", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 population = { "Alabama":4.863, ..., "Wyoming":0.586 }
+total_pop = 0
 for state in population:
     total_pop = total_pop + population[state]
 ~~~~~
