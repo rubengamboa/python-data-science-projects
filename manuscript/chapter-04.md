@@ -138,14 +138,14 @@ Unfortunately, simply copying each element as shown in Listing 4.5, is not enoug
 
 ![Figure 4.4: A Dictionary Shared by Two Lists](images/x-y-common-element.png)
 
-As you can see from Figure 4.4, assigning a deep structure from one variable to another in such a way that each variable has its own entire copy is not an easy proposition. You *could* write a function to do it, but luckily Python provides a simple mechanism. Just use `x.copy()` to create a *copy* of `x` and asisgn that to `y`. This is shown in Listing 4.6.
+As you can see from Figure 4.4, assigning a deep structure from one variable to another in such a way that each variable has its own entire copy is not an easy proposition. You *could* write a function to do it, but luckily Python provides a simple mechanism. Just use `x.copy()` to create a *copy* of `x` and assign that to `y`. This is shown in Listing 4.6.
 
 {title="Listing 4.6: Copying a List Pythonically", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
-x = [1, 2, 3, 4, 5]
+x = [1, [2, 3, 4], 5]
 
 y = x.copy()
 ~~~~~
 
-After the code in Listing 4.6, changes to `y` or its elements will not be reflected in `x` or vice versa.
+After the code in Listing 4.6, changes to `y` or its elements will not be reflected in `x` or vice versa, because `x` and `y` will refer to two different copies of the object, and each element in those lists will also refer to different copies. Specifically, the second element of `x`, which is the nested list `[2, 3, 4]`, will also have a *different* copy in `y`.
 
