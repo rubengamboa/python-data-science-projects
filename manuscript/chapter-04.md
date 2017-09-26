@@ -27,6 +27,94 @@ Using these functions, it's a simple matter to break a substitution cipher as fo
 
 As it turns out, you may find that you don't quite end up with the right substitution key, meaning that the decrypted text you end up with is not actual English at all.  What's happening is that the technique we're using amounts to an *optimization* technique, where we decide whether the previous key or the mutated key gets us closer to the final answer. This idea works in many cases, but in some cases it ends up stuck at a local minimum instead of finding the global minimum.  This is shown in Figure 4.1, where you can clearly see that the algorithm we described can get stuck in the local minimum to the right, and completely miss the true global minimum on the left.
 
-![Figure 4.1: Frequent, Large Words in the Declaration of Independence](images/local-optimization.png)
+![Figure 4.1: Optimization and Local Minima](images/local-optimization.png)
 
 One way to get around this problem is to choose the mutated key some times, even if it leads to a worse likelihood. Of course, we don't want to do this **all** the time. It makes sense to allow switching to a "worse" key in a way that considers the likelihoods of the resulting strings. For example, suppose the optimal (so far) key so far results in a *probability* of 0.75, but by changing two letters we end up with a key that results in a *probability* of only 0.25. Ordinarily, we would choose to keep the optimal (so far) key and forget about the new key. However, to avoid getting stuck in local minima, we'll want to keep the new key every once in a while. Since the new key is three times ({$$}0.75/0.25=3{/$$}) less likely than the optimal key, we should decide to switch to the new key only 1/3 of the time. Notice that if the new key is only slightly worse than the old one, we will nevertheless switch to the new key just a little less than 1/2 of the time. This approach is not the only possibility to avoid local minima, but it's definitely one that works well in practice.
+
+Unlike previous projects, this project does not introduce any new Python techniques. So there's a good chance that you can just tackle it. But there are some tricks that may be new, so take a look at the rest of this chapter if you get stuck.
+
+## Random Numbers
+
+In this project, you will use random numbers for several different tasks:
+
+* Configuring the initial substitution key, where each letter is mapped to a random letter,
+* Choosing two letters to "swap" in order to make a new substitution key, and
+* Deciding whether to switch to the new substitution key when it's not as good as the original key.
+
+To use random numbers, first import the `random` module. This module contains many different functions related to random numbers. For example, the function `random.shuffle(l)` will randomly rearrange the items in the list `l`. This is illustrated in the code in Listing 4.1, where the list `l` will end up as some permutation of `[1, 2, 3, 4, 5]`, possibly but not necessarily `[1, 5, 4, 3, 2]`.
+
+{title="Listing 4.1: Permuting a List Randomly", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import random
+
+l = [1, 2, 3, 4, 5]
+random.shuffle(l)
+# l is now a permutation of [1, 2, 3, 4, 5], POSSIBLY [1, 5, 4, 3, 2]
+~~~~~
+
+You may be troubled by the fact that we cannot know the result of `random.shuffle(l)`. Such is the way of random numbers, and generally we are happy that there is no way to know the result. However, in some settings it is vital that we always get the same results, for example when describing examples in function docstrings. Python allows you to make random numbers totally predictable (in principle) by letting you set the random seed. In particular, if you call `random.seed(19483)`, or any other number instead of `19483`, you are forcing random to return a fixed sequence from that point on. There is no effective way of knowing what values random will return, so in a certain sense they way as well be random still, but you are guaranteed that from that point on, you will always get the same sequence. This is illustrated in Listing 4.2. 
+
+{title="Listing 4.2: Permuting a List Deterministically", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import random
+
+l = [1, 2, 3, 4, 5]
+random.seed(19483)
+random.shuffle(l)
+# l is now GUARANTEED to be [1, 4, 2, 3, 5]
+~~~~~
+
+Why would you want to permute a list? This is a good way to initialize the random substitution key. For instance, start with a list containing `["a", "b", ..., "z", " ", "."]` and shuffle it. Then the letter `"a"` can map to the first element of that list, `"b"` to the second one, and so on.
+
+Another useful function is `random.randint(a, b)`. This selects a random integer in the range from `a` to `b` *inclusive*. For example, if you call `random.ranint(1, 3)` a number of times, the function will return either 1, 2, or 3, each a third of the time. This can be used to select two letters to swap to make a new substitution cipher.
+
+Finally, the function `random.random()` returns a random number between 0 and 1, such as `0.38737738176471215`. This is often used to decide between two alternatives with a certain probability. For example, if you wish to pick outcome 1 with a probability of 0.25, you can check that the value returned in a call to `random.random()` is less than or equal to 0.25. You will want to use this when you're deciding whether to switch to a new substitution key that is not quite as good as the last one.
+
+## Swapping Two Variables
+
+Swapping two variables is a task that is surprisingly difficult. For example, Listing 4.3 shows a common mistake.
+
+{title="Listing 4.3: Swapping Two Variables Incorrectly", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+x = 1
+y = 2
+
+x = y
+y = x
+~~~~~
+
+The program in Listing 4.3 does *not* swap the values of `x` and `y`. The reason is that after Line 4, *both* `x` and `y` have the value 2, so Line 5 does essentially nothing. That is, the value 2 in `x` is stored in `y`, which was already 2.
+
+What is needed to correct this is to somehow remember the old value of `x` before assigning the value of `y` to it. This is illustrated in Listing 4.4.
+
+{title="Listing 4.4: Swapping Two Variables Correctly", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+x = 1
+y = 2
+
+t = x
+x = y
+y = t
+~~~~~
+
+In Line 4, the variable `t` is introduced simply to keep the value of `x` before it is wiped with the value of `y` in Line 5. Then the variable `y` is assigned this saved value in Line 6, so it ends up with the original value of `x`. This works, with the caveat that we introduced a new temporary variable `x`, and it is very important that there cannot be another variable called `t` in the program!
+
+The program in Listing 4.4 works, and it is the only way to swap two variables in most languages. As it turns out, Python offers a better way to swap variables, as seen in Listing 4.5.
+
+{title="Listing 4.4: Swapping Two Variables Pythonically", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+x = 1
+y = 2
+
+x, y = y, x
+~~~~~
+
+In Line 4, the values of `x` and `y` *together* are assigned the values of `y` and `x` *together*. What this means is that the value of `y` ends up in `x` and the value in `x` ends up in `y`. This is a very nice shorthand for swapping variables, and it is just one of the ways that the syntax of Python is designed to simplify common tasks.
+
+## Copying a Deep Structure
+
+There is a very big subtlety that comes up when you assign a complex structure, like a dictionary or a list, to a new variable. For example, suppose that `x` contains the list `["a", "b", "c"]` and you assign `x` to `y`. What is `y[1]`? I'm sure you agree that it must have the letter `"b"`. But what happens if you change `y[1]` to `"fred"`? Then, obviously, `y[1]` now has the value `"fred"`. So far so good. But now, what is the value of `x[1]`?
+
+If you guessed `"fred"`, then you know the problem we are describing. This is seen in Figure 4.2, which illustrates what happens immediately after `x` is assigned to `y`.
+
+![Figure 4.2: Assigning a List](images/x-y-same.png)
