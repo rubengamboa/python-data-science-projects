@@ -115,6 +115,37 @@ In Line 4, the values of `x` and `y` *together* are assigned the values of `y` a
 
 There is a very big subtlety that comes up when you assign a complex structure, like a dictionary or a list, to a new variable. For example, suppose that `x` contains the list `["a", "b", "c"]` and you assign `x` to `y`. What is `y[1]`? I'm sure you agree that it must have the letter `"b"`. But what happens if you change `y[1]` to `"fred"`? Then, obviously, `y[1]` now has the value `"fred"`. So far so good. But now, what is the value of `x[1]`?
 
-If you guessed `"fred"`, then you know the problem we are describing. This is seen in Figure 4.2, which illustrates what happens immediately after `x` is assigned to `y`.
+If you guessed `"fred"`, then you know the problem we are describing. This is seen in Figure 4.2, which illustrates what happens immediately after `x` is assigned to `y`. As you can see from the graph, after the assignment `x` and `y` are both referring to the *same* list, so changing an entry in `x` will necessarily change the corresponding entry in `y` and vice versa.
 
 ![Figure 4.2: Assigning a List](images/x-y-same.png)
+
+If you want `y` to have its own *copy* of the list (or dictionary) that `x` refers to, so that changes in `y` are *not* propagated in `x`, then you need a situation like the one shown in Figure 4.3. But that means that you must copy each element in `x` to a new list in `y`, as shown in Listing 4.5.
+
+![Figure 4.3: Copying a List](images/x-y-cloned.png)
+
+{title="Listing 4.5: Copying the Elements of a List", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+x = [1, 2, 3, 4, 5]
+
+y = []
+for e in x:
+    y.append(e)
+~~~~~
+
+After the code in Listing 4.5 is executed, `x` and `y` will both refer to a list containing the numbers 1, 2, 3, 4, and 5. However, `x` and `y` will refer to *different* list with those elements, as seen in Figure 4.3, so that changes to `y` will not be reflected back in `x` or vice versa.
+
+Unfortunately, simply copying each element as shown in Listing 4.5, is not enough. The reason is that complex objects, like lists and dictionaries, may contain complex objects inside, such as list inside a list or a list inside a dictionary. Simply copying the elements will result in a new outer list, but both the original list and the copy may still be referring to the same elements. In other words, changes to `x[1]` may still show up in `y[1]`. This situation is illustrated in Figure 4.4. Given the the situation shown in that figure, changing the value of `x[1]["b"]` will *also* necessarily change the value in `y[1]["b"]`.
+
+![Figure 4.4: A Dictionary Shared by Two Lists](images/x-y-common-element.png)
+
+As you can see from Figure 4.4, assigning a deep structure from one variable to another in such a way that each variable has its own entire copy is not an easy proposition. You *could* write a function to do it, but luckily Python provides a simple mechanism. Just use `x.copy()` to create a *copy* of `x` and asisgn that to `y`. This is shown in Listing 4.6.
+
+{title="Listing 4.6: Copying a List Pythonically", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+x = [1, 2, 3, 4, 5]
+
+y = x.copy()
+~~~~~
+
+After the code in Listing 4.6, changes to `y` or its elements will not be reflected in `x` or vice versa.
+
