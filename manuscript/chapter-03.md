@@ -238,13 +238,60 @@ with open("output.txt", "w") as f:
 
 Notice how each line written to the output file ends in a newline. You may be concerned that this will not work properly under Microsoft Windows, since it uses a carriage return followed by a newline to separate lines. However, this is one place that Python betrays its origins in Unix systems. It simply allows you to use newlines to separate lines, and it converts the newlines to whatever convention is used in the operating system where it is running. In other words, you can simply use `"\n"` when writing, and Python will output a single newline in Linux and Mac systems, and a carriage return followed by a newline in Microsoft systems. In other words, just use `"\n"` and Python will do the Right Thing.
 
+## Testing Functions that Return Dictionaries
+
+As we saw in previous projects, it is very important that you test each function on its own. We used examples to specify what value should be returned from the function, such as `f(3)` should return `6`. That's easy enough when functions return simple objects like integers, but what do we do if the function returns a dictionary?
+
+One of the problems is that dictionaries, by their very nature, do not have any sense of order. For example, the following two dictionaries should be completely identical in Python:
+
+* `x = {'a': 1, 'b': 2}`
+* `y = {'b': 2, 'a': 2}`
+
+What should matter is the entries in the dictionary, not the order in which they appear. But `doctest` does not do any special processing for dictionaries, so you will need to.
+
+There are some approaches that you can follow. One is to make sure you are listing the entries in a specific order. You can do that by converting the dictionary to a list (which *is* ordered), and then sorting that list so that the entries appear in a predictable order. For example, both of the following expressions will list the entries in the same order:
+
+* `sorted(x.items())`
+* `sorted(y.items())`
+
+This means that if `f()` is a function that returns a dictionary like the ones above, you can test it as follows:
+
+~~~~~
+>>> sorted(construct_dictionary().items())
+[('a', 1), ('b', 2)]
+~~~~~
+
+Notice that the result is a list, so you can be sure it will always be in this particular order.
+
+Another option is to test individual entries in the dictionary. For example, you can check that the value of `a` is 1 and the value of `b` is 2:
+
+~~~~~
+>>> result = construct_dictionary()
+>>> result['a']
+1
+>>> result['b']
+2
+~~~~~
+
+This brings up one remaining point. What if the values in the dictionary are floats? Then the answer isn't `1` exactly; it may be `1.00000001` instead! To avoid this, use an explicit comparison test:
+
+~~~~~
+>>> result = construct_dictionary()
+>>> abs(result['a']-1) <= 0.0001
+True
+>>> abs(result['b']-2) <= 0.0001
+True
+~~~~~
+
+The `0.0001` is a tolerance, so numbers in the range `0.9999` to `1.0001` will be considered equal to 1, as far as testing is concerned. This is usually correct, since the actual values may differ depending on the actual computer where the program is executed.
+
 ## JSON
 
 Up to this point, we have been building projects that do all of their own work. But this project calculates the frequency of letter pairs, and those frequencies will be used in the next project. So now we have to discuss how one program can produce an output that another program can read.
 
 There have been many different solutions to this problem in the history of computing. A solution that is favored by many programmers is to use JSON, which is a text notation for representing numbers, strings, lists, and dictionaries. I.e., JSON can store the types of Python objects that we have used so far, store them in a text file, and retrieve them from a text file. Although we will not take advantage of this feature in any of our projects, JSON is also an attractive solution because it can be used in almost any programming language. For example, it was originally developed in JavaScript, and in fact JSON stands for "**J**ava**S**cript **O**bject **N**otation", but you can read and write JSON in Python, Java, C#, etc.
 
-Writing a JSON file is trivial in Python.  First you need to `import` the module `json`, then you can call `json.dumps(object, file)` to write the Python object `object` to the file `file`, which should be open for writing. This is shown in Listing 3.12.
+Writing a JSON file is trivial in Python.  First you need to `import` the module `json`, then you can call `json.dump(object, file)` to write the Python object `object` to the file `file`, which should be open for writing. This is shown in Listing 3.12.
 
 {title="Listing 3.12: Writing to a File", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
@@ -252,7 +299,7 @@ import json
 
 population = { "Alabama":4.863, ..., "Wyoming":0.586 }
 with open("output.json", "w") as f:
-    json.dumps(population, f)
+    json.dump(population, f)
 ~~~~~
 
 To read the dictionary from the file, use the function `json.load(f)` where `f` is a file that is opened for reading. This is shown in Listing 3.13.
