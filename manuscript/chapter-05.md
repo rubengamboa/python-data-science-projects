@@ -146,7 +146,7 @@ for i in range(v.shape[0]):
 
 You can use similar code to double all the entries in the matrix `m`, but you would need two nested loops, one for the rows and another for the columns. However, there are better ways of doing so! You can multiply `numpy` arrays by a constant, and that returns an array that has all the elements of the original multiplied by that constant. In particular, we can double an array as shown in Listing 5.5.
 
-{title="Listing 5.4: Doubling Numpy Vectors and Matrices", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 5.5: Doubling Numpy Vectors and Matrices", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
 v = np.array([1, 2, 3])
 m = np.array([[11, 12, 13],
@@ -156,4 +156,40 @@ v2 = 2*v
 m2 = 2*m
 ~~~~~
 
-Of course, you can also add, subtract, or divide all the elements of a `numpy` array using similar code.
+Of course, you can also add, subtract, or divide all the elements of a `numpy` array using similar code. So should you use the special `numpy` ways of manipulating `numpy` arrays, or should you stick to getting and setting individual elements in the array? It may seem like working with elements individually is a better idea, since it works not just for `numpy` arrays but also for Python lists and other structures. In fact, however, there is a significant advantage to using the specialized routines in `numpy`. These routines are *much* faster than the equivalent Python code that processes individual elements. For example, the `numpy` routines may take advantage of specialized hardware, such as graphics accelerators, to perform the computations, and that will result in vastly faster programs.
+
+Other vector or matrix operations also work on individual elements at a time. For example, the sum of two matrices is the result of adding corresponding elements. Using the `numpy` module, these operations can be performed using the regular arithmetic operators, as seen in Listing 5.6. This only works if the matrices are compatible, i.e., if they have the same shape. Again, using these operators is far preferable to coding your own loops to accomplish the same task in Python.
+
+{title="Listing 5.6: Element-wise Matrix and Vector Operations", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+m1 = np.array([[11, 12, 13],
+               [21, 22, 23],
+               [31, 32, 33]])
+m2 = 2*m1
+
+m3 = m1 + m2
+~~~~~
+
+`Numpy` supports other common matrix and vector operations. For example, the dot product of two vectors can be computed using the function `np.dot(v1,v2)`. Listing 5.7 shows the computation of dot products using a basic for loop and with the `numpy` operation. These will compute the same result, but the `numpy` operation will be significantly faster and is easier to code.
+
+{title="Listing 5.7: Computing Dot Products", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+v1 = np.array([1, 2, 3])
+v2 = np.array([7, -5, 2])
+
+dot1 = 0
+for i in (v.shape[0]):
+    dot1 = dot1 + v1[i]*v2[i]
+
+dot2 = np.dot(v1, v2)
+~~~~~
+
+The function `np.dot(...)` can be used to multiply matrices as well as vectors, so if `v` is vector and `m1` and `m2` are matrices, you can use `numpy` to compute any of the following:
+
+* `np.dot(m1, v)`
+* `np.dot(v, m2)`
+* `np.dot(m1, m2)`
+
+This works provided that the given products are defined, meaning that the matrices have the right shape to be multiplied. In the third case, for example, the number of columns in `m1` should be the same as the number of rows in `m2`.
+
+Finally, there are functions in `numpy` that calculate various properties of vectors and matrices. For example, the function `np.sum(x)` finds the sum of all the elements in `x`, and it does it much more quickly than the equivalent code using loops.
