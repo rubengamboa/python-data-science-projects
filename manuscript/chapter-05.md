@@ -32,25 +32,3 @@ But that leaves us with a problem: How do we know the facts that we assumed we k
 * How many of those involved the Broncos?
 * How many of those did the Broncos win?
 
-So now, the chance that the computer will visit the Broncos next is 80% of the Broncos victories in Cowboys-Broncos games plus 20% of the Broncos defeats in Cowboys-Broncos games, all divided by the total number of Cowboys games. So if the Cowboys played a total of 20 games, 13 of which were Broncos games, including  9 Broncos victories and 4 Broncos defeats, we can say that the chance the computer will visit the Broncos next is
-{$$}\frac{9(80\%) + 4(20\%)}{20} = 40\%{/$$}.
-
-That's how we can compute the chances that the computer will move to team A after visiting team B. In general, we have {$$}n\times n{/$$} of these chances, to account for the possible moves from any team to any other team. That is, we need {$$}32\times32{/$$} entries for all the 32 teams in the NFL, and {$$}3\times2{/$$} entries for the abbreviated league with only the Broncos, Giants, and Cowboys.
-
-The easiest way to organize {$$}n\times n{/$$} results is to use a *matrix*, or a 2-dimensional array consisting of {$$}n{/$$} rows and {$$}n{/$$} columns (one for each team). We can call this matrix {$$}M{/$$}, and the entry in row {$$}i{/$$} and column {$$}j{/$$}, called {$$}M_{i,j}{/$$}, is the chance that the computer will move to team {$$}i{/$$} from team {$$}j{/$$}. Be very careful with that order! {$$}M_{i,j}{/$$} is the chance of moving from {$$}j{/$$} to {$$}i{/$$}, not the other way around. For example, in our abbreviated league, the entry {$$}M_{1,3}=0.4{/$$} is the chance that the computer moves from the Dallas Cowboys (Team 3) to the Denver Broncos (Team 1).
-
-If you define the matrix {$$}M{/$$} as described above and an initial distribution vector {$$}v{/$$}, the operation that finds {$$}v'{/$$}, the new and improved distribution vector is given by matrix-vector multiplication. In particular, {$$}v' = Mv{/$$}. 
-
-You can represent matrices and vectors in Python in many different ways, and you can also find different ways to compute the product of a matrix and a vector in Python. But by far the best way is to use the module `numpy`, which set the bar for scientific computing in Python. So if you haven't used `numpy` before, take the time to learn it just enough to complete this project. You won't regret it.
-
-To summarize, we can find a good distribution as follows:
-
-1. Define the matrix {$$}M{/$$} by exploring the historical game data.
-2. Start with a random vector {$$}v{/$$} (which should have entries adding up to 1).
-3. Repeatedly compute {$$}v = Mv{/$$} using matrix-vector multiplication.
-4. As the end, scale the vector {$$}v{/$$} so that its entries add up to 1.
-
-Notice that the vector is normalized in Step 4, so that it represents an actual probability vector (i.e., so that its entries add up to 1).  It  usually helps to normalize the vector each time in the loop in Step 3, just to keep it from growing too large or too small.
-
-So there you have it. We've seen two different ways of using the historical game data to come up with a ranking of NFL teams. You should implement both of these techniques, and you can compare the results to see how close they are to each other. Be sure to loop enough times for the results to stabilize, at least 1,000,000 for the random walk and 10,000 for the matrix-vector multiply.
-
