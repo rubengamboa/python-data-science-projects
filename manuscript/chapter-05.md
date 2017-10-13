@@ -47,7 +47,7 @@ To summarize, we can find a good distribution as follows:
 
 1. Define the matrix {$$}M{/$$} by exploring the historical game data.
 2. Start with a random vector {$$}v{/$$} (which should have entries adding up to 1).
-3. Repeatedly compute {$$}v = Mv{$$} using matrix-vector multiplication.
+3. Repeatedly compute {$$}v = Mv{/$$} using matrix-vector multiplication.
 4. As the end, scale the vector {$$}v{/$$} so that its entries add up to 1.
 
 Notice that the vector is normalized in Step 4, so that it represents an actual probability vector (i.e., so that its entries add up to 1).  It  usually helps to normalize the vector each time in the loop in Step 3, just to keep it from growing too large or too small.
@@ -71,11 +71,11 @@ As you can see it is a CSV file, that is a file in comma-separated format, where
 
 So your first task is to read this file. But how do you read a CSV file in Python? There are two answers to this. First, a CSV file is just a text file, so you could read the same way that you read text files in previous projects. Then you could process each line and split the entries based on the commas in the line. However, breaking up the fields by commas is not as easy as it sounds, because fields could *contain* commas, in which case the fields would be quoted. For example, one of the lines could be
 
-* "Smith, Alexander", M, 27
+* `"Smith, Alexander", M, 27`
 
 This line has only three fields, not four, but the first field contains a comma. Moreover, quotes themselves are subtle because a field can contain a quote, in which case it must be escaped:
 
-* "Smith, Alexander \"the great\"", M, 27
+* `"Smith, Alexander \"the great\"", M, 27`
 
 And we won't mention the fact that escape characters, like the \, can themselves be escaped!
 
@@ -123,3 +123,38 @@ m = np.array([[11, 12, 13],
               [31, 32, 33]])
 ~~~~~
 
+You can access individual elements of a `numpy` array using list-like indexing notation. For example, you can get the second element of the vector `v` using `v[1]`, as you may have expected. For matrices, the indexing is a little different than when using Python lists. Instead of using two list indexes, as in `m[1][2]`, you use a single compound index. So to get the element in the second row and third column, you would use `m[1,2]`. Naturally, you can use these to get and set the value of an entry. For example, Listing 5.3 shows how you can create a vector with entries that are twice as large as `v`.
+
+{title="Listing 5.3: Iterating Over Numpy Vectors", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+v = np.array([1, 2, 3])
+v2 = np.array([0, 0, 0])
+for i in range(3):
+    v2[i] = 2*v[i]
+~~~~~
+
+At the end of Listing 5.3, `v2` will have the value `array([2, 4, 6])`, where the `array` is used to emphasize that we're working with `numpy` arrays and not Python lists. However, the code in Listing 5.3 has a few problems. The most obvious problem is that it only works for arrays that have exactly three elements. It would obviously be better if we could get the length of the array, just as we can for Python lists. Another problem is that we have to create `v2` with the right number of elements, but we only know how to initialize an array from a Python list, so this means we have to build a list with just the right number of elements first.
+
+Both problems are easy to solve. Every `numpy` array has a property called `shape` that stores the number of rows and columns in the array. So `v.shape[0]` has the number of elements in the vector `v`, `m.shape[0]` the number of rows in `m` and `m.shape[1]` the number of columns in `m`. Moreover, you can create an array of zeros of a given shape with `np.zeros(shape)`. Listing 5.4 uses these functions to improve the vector doubling code in Listing 5.3
+
+{title="Listing 5.4: Iterating Over Numpy Vectors", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+v = np.array([1, 2, 3])
+v2 = np.zeros(v.shape)
+for i in range(v.shape[0]):
+    v2[i] = 2*v[i]
+~~~~~
+
+You can use similar code to double all the entries in the matrix `m`, but you would need two nested loops, one for the rows and another for the columns. However, there are better ways of doing so! You can multiply `numpy` arrays by a constant, and that returns an array that has all the elements of the original multiplied by that constant. In particular, we can double an array as shown in Listing 5.5.
+
+{title="Listing 5.4: Doubling Numpy Vectors and Matrices", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+v = np.array([1, 2, 3])
+m = np.array([[11, 12, 13],
+              [21, 22, 23],
+              [31, 32, 33]])
+v2 = 2*v
+m2 = 2*m
+~~~~~
+
+Of course, you can also add, subtract, or divide all the elements of a `numpy` array using similar code.
