@@ -32,3 +32,6 @@ But that leaves us with a problem: How do we know the facts that we assumed we k
 * How many of those involved the Broncos?
 * How many of those did the Broncos win?
 
+So now, the chance that the computer will visit the Broncos next is 80% of the Broncos victories in Cowboys-Broncos games plus 20% of the Broncos defeats in Cowboys-Broncos games, all divided by the total number of Cowboys games. So if the Cowboys played a total of 20 games, 13 of which were Broncos games, including  9 Broncos victories and 4 Broncos defeats, we can say that the chance the computer will visit the Broncos next is
+{$$}\frac{9(80\%) + 4(20\%)}{20} = 40\%{/$$}.
+
