@@ -38,3 +38,5 @@ That's how we can compute the chances that the computer will move to team A afte
 
 The easiest way to organize {$$}n\times n{/$$} results is to use a *matrix*, or a 2-dimensional array consisting of {$$}n{/$$} rows and {$$}n{/$$} columns (one for each team). We can call this matrix {$$}M{/$$}, and the entry in row {$$}i{/$$} and column {$$}j{/$$}, written {$$}M_{i,j}{/$$}, is the chance that the computer will move to team {$$}i{/$$} from team {$$}j{/$$}. Be very careful with that order! {$$}M_{i,j}{/$$} is the chance of moving from {$$}j{/$$} to {$$}i{/$$}, not the other way around. For example, in our abbreviated league, the entry {$$}M_{1,3}=0.4{/$$} is the chance that the computer moves from the Dallas Cowboys (Team 3) to the Denver Broncos (Team 1).
 
+If you define the matrix {$$}M{/$$} as described above and an initial distribution vector {$$}v{/$$}, the operation that finds {$$}v'{/$$}, the new and improved distribution vector is given by matrix-vector multiplication. In particular, {$$}v' = Mv{/$$}. 
+
