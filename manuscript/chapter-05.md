@@ -1,195 +1,151 @@
-# Matrices: Ranking NFL Teams
+# Using Ngrams: Breaking Caesar Cyphers
 
 In this project, you will learn
 
-* How to read CSV files with the module `csv`
-* How to use the module `numpy` to work with matrices and vectors
-* That a single problem can have many radically different solutions
+* How to implement a random walk
+* How to read JSON files into Python objects
 
-## Project: Ranking NFL Teams
+## Project: What Does This Say?
 
-The objective of this program is to find a ranking of NFL teams by studying the result of NFL games played over a 25-year span. Using this ranking, we can predict the outcome of future games. For example, if the Denver Broncos are ranked higher than the New York Giants, then we can predict that the Broncos will win their upcoming game against the Giants.
+When Julius Caesar commanded the Roman 13th Legion, he needed a way to send orders to his generals that could not be read by the enemy. He developed a simple way of doing so by shifting letters. For example, a simple substitution of one means that instead of "A" he would write "B"; instead of "B", "C"; instead of "C", "D"; and so on. The substitution wraps, so instead of "Z" he would write "A".  Thus the word "CAESAR" becomes "DBFTBS". This basic technique is called a *Caesar Cipher*.
 
-There are different approaches to solving this problem. Here is a simple one. Suppose that we can write a program that spends part of its time with any one of the NFL teams. At the end of each minute, it randomly moves to some other team. But as it moves from team to team, it's biased in favor of moving to winning teams. After a long enough period of time, we can see which teams are better than others by simply comparing the amount of time that the program spent with each team. Since the program is biased in favor of winners, if it spent more time with the Denver Broncos than with the New York Giants, that must mean that the Denver Broncos are more likely to win. That's how we can predict that the Broncos will defeat the Giants.
+If you know you're looking at a Caesar cipher, then you can easily break it. All you need to know is what the shift is, such as shift by one, or shift by five letters. A slightly more sophisticated cipher is a substitution cipher, in which some letters just map to other letters, but not necessarily by a fixed shift. For example, "A" becomes "F", "B" becomes "T", "C" becomes "A", and so on. Breaking these ciphers is considerably more difficult, since there are far more than 26 possible different substitution ciphers. In fact, there are approximately {$$}4\times10^{26}{/$$} different substitution ciphers. That's 4, followed by 26 zeros, or 400 septillions!
 
-So what do we mean by the program "spending part of its time with an NFL team" and "moving from one team to another"? This can refer to a simple loop, executed perhaps a million times. Each time through the loop, the program has a "favored" team, and it keeps track of how many times each team was favored. At the very beginning of the loop, the program can start favoring any team at random, or your personal favorite team, for example. The key is choosing the *next* time each time through the loop. This is where we can favor "winning" teams. A simple way is to pick at random any game that involved the currently favored team, and then move to whichever team won that game. In practice, it helps to give both teams involved in the game a chance to be favored, so we may pick the victor four out of five times, and the loser only one of five teams. As in the previous project, randomly choosing the loser *some* of the time prevents getting stuck at a local minimum.
+The way to break such ciphers is to make use of the distribution of letters in the English language. In this project, you will break a cipher by using what you learned about pairs of letters in the previous project.
 
-Another technique for ranking the teams is to simulate the effects of the random walk all at once. Here's the idea. Start with a vector (or a Python list) with 32 entries (one for each NFL team) representing the chances that the computer will be visiting each given team. For example, the vector may say that the computer will visit the Denver Broncos 5% of the time, the New York Giants 4% of the time, and so on. The key, of course, is that all these probabilities must add up to 100%. Then the next step is to make the probabilities in this vector consistent by examining what happens each time the computer moves from a team to another team.
+Your first task is to read the JSON file of letter pair frequencies that you created in the last project. Once you have this, write a function called `likelihood(s)` that computes the likelihood of a string being in the English language. For example, the likelihood of "the cat in the hat" should be very high, but the likelihood of gibberish such as "aj kdit aknoeihb eibs" should be very, very small.
 
-Let's make that more clear. Suppose that we have only three teams, say the Denver Broncos, New York Giants, and Dallas Cowboys.  The vector may look like `[0.5, 0.3, 0.2]` meaning that the computer spends 50% of its time with the Broncos, 30% with the Giants, and 20% with the Cowboys. Now imagine further that we know the following three facts:
+Here is a way to compute the likelihood of a phrase like "cat". Use the known frequency of letter pairs to find the probability of the pair "ca", call that {$$}p_{ca}{/$$}. Similarly, look up the probability of "at" and call that {$$}p_{at}{/$$}. A good estimate for the likelihood is {$$}p_{ca} \times p_{at}{/$$}. Obviously, this generalizes to strings of arbitrary length.
 
-* If the computer is visiting the Broncos, there's a 50% chance that it chooses to visit the Broncos at the next step.
-* If the computer is visiting the Giants, there's a 60% chance that it chooses to visit the Broncos at the next step.
-* If the computer is visiting the Cowboys, there's a 40% chance that it chooses to visit the Broncos at the next step.
+The only problem with this approach for estimating likelihood is that it results in very small numbers. The probability of any given pair is very small, say 1%. So if you look at text that consists of 10 characters, the combined probability may be 0.00000000000000000001%. If you look at text that is the length of a typical letter, the probability is essentially zero. This wouldn't be a big problem, except that computers can only store numbers with a certain amount of precision, so very soon all text will just have probability zero, and you can never distinguish English from gibberish.
 
-A> Notice that these probabilities do not need to add at to 100%, since they make different assumptions, i.e., they assume different cities for the starting condition.
+A clever solution to this problem is to scale the probabilities in some way. For example, using the square roots of the probabilities instead of the probabilities themselves will make all the likelihoods just slightly bigger and delay the problem. Ultimately, a better solution is to take the logarithm of the probabilities, because {$$}\log(p_{ca}p_{at}) = \log(p_{ca})+\log(p_{at}){/$$}. So not only do the probabilities of individual pairs become manageable (e.g., {$$}\log(0.00000000000000000001)=-20{/$$}), the products of the probabilities are replaced by sums, so the numbers stay in roughly the same magnitude. That means we can apply this approach to both short texts and long texts, so we can decipher tweets as well as *War and Peace*.
 
-With these probabilities, we can get a *better* estimate of the chances that the computer will be visiting the Broncos. We're thinking that it has a 50% chance of visiting the Broncos right now, and there's a further 50% that it will choose to remain visiting the Broncos. Combined, that's a 25% chance of staying with the Broncos. But there's an additional possibility. There is a 30% chance that we are currently visiting the Giants, and a further 60% chance that we'll then visit the Broncos. So that gives us an additional {$$}30\times60{/$$} chance, or 18% chance, of visiting the Broncos in the next step. *And* we have a 20% chance of visiting the Cowboys right now, with a 40% chance of moving to the Broncos, for an additional 8% chance to end up at the Broncos. Altogether, that ends up being 25%+18%+8%=51% that we'll visit the Broncos at the next step. This is a better estimate than the 50% we started with, because it takes into account the chances that we are visiting any of those three times at the current time. As you can imagine, we can repeat this process a number of times, and eventually we will end up with a very accurate distribution describing the chances that the computer is visiting any given team. In fact, you can start with a *random* distribution in the beginning, and you'll still end up with an accurate distribution after repeating this process enough times.
+Next, you need a way to keep track of a "key" to decrypt a substitution cipher. This need only be a map from letters to letters, so a Python dictionary will work just fine. Write a function called `decrypt(text, key)` that decrypts the `text` using the given `key`. For example, the text "DBFTBS" with the key `{"A":"B", "B":"C", ..., "Z":"A"}` should decrypt to "CAESAR".
 
-But that leaves us with a problem: How do we know the facts that we assumed we knew, such as the 40% chance that we'll visit the Broncos next if we're currently visiting the Cowboys? The answer is that we can compute this information at the very beginning, using the 25-year history of games played. Here's how we can do this. Suppose we are currently visiting the Cowboys. In the random walk described earlier, the computer would pick a game at random out of all the games played by the Cowboys. Then it would move to the winner of that game 80% of the time, and to the loser 20% of the time. In general, we have to consider these questions about *all* the games played by the Cowboys:
+Using these functions, it's a simple matter to break a substitution cipher as follows. Start with a random substitution key, use the key to decrypt the text, and see how likely it is. After that, randomly change the substitution key by swapping two letters. For example, if "A" was encoded as "G" and "K" as "T", change the key so that "A" is encoded as "T" and "K" as "G" instead. Of course, you pick "A" and "K" randomly, so there are many possible new keys that you can generate. Just pick one. At this point, use the new key to decrypt the text and figure out how likely this new version is. Keep the substitution key that results in the most English-like text. If you do this enough times, you will end up with the correct substitution key.
 
-* How many total games did the Cowboys play?
-* How many of those involved the Broncos?
-* How many of those did the Broncos win?
+As it turns out, you may find that you don't quite end up with the right substitution key, meaning that the decrypted text you end up with is not actual English at all.  What's happening is that the technique we're using amounts to an *optimization* technique, where we decide whether the previous key or the mutated key gets us closer to the final answer. This idea works in many cases, but in some cases it ends up stuck at a local minimum instead of finding the global minimum.  This is shown in Figure 5.1, where you can clearly see that the algorithm we described can get stuck in the local minimum to the right, and completely miss the true global minimum on the left.
 
-So now, the chance that the computer will visit the Broncos next is 80% of the Broncos victories in Cowboys-Broncos games plus 20% of the Broncos defeats in Cowboys-Broncos games, all divided by the total number of Cowboys games. So if the Cowboys played a total of 20 games, 13 of which were Broncos games, including  9 Broncos victories and 4 Broncos defeats, we can say that the chance the computer will visit the Broncos next is {$$}\frac{9(80\%) + 4(20\%)}{20} = 40\%{/$$}.
+![Figure 5.1: Optimization and Local Minima](images/local-optimization.png)
 
-That's how we can compute the chances that the computer will move to team A after visiting team B. In general, we have {$$}n\times n{/$$} of these chances, to account for the possible moves from any team to any other team. That is, we need {$$}32\times32{/$$} entries for all the 32 teams in the NFL, and {$$}3\times2{/$$} entries for the abbreviated league with only the Broncos, Giants, and Cowboys.
+One way to get around this problem is to choose the mutated key some times, even if it leads to a worse likelihood. Of course, we don't want to do this **all** the time. It makes sense to allow switching to a "worse" key in a way that considers the likelihoods of the resulting strings. For example, suppose the optimal (so far) key so far results in a *probability* of 0.75, but by changing two letters we end up with a key that results in a *probability* of only 0.25. Ordinarily, we would choose to keep the optimal (so far) key and forget about the new key. However, to avoid getting stuck in local minima, we'll want to keep the new key every once in a while. Since the new key is three times ({$$}0.75/0.25=3{/$$}) less likely than the optimal key, we should decide to switch to the new key only 1/3 of the time. Notice that if the new key is only slightly worse than the old one, we will nevertheless switch to the new key just a little less than 1/2 of the time. This approach is not the only possibility to avoid local minima, but it's definitely one that works well in practice.
 
-The easiest way to organize {$$}n\times n{/$$} results is to use a *matrix*, or a 2-dimensional array consisting of {$$}n{/$$} rows and {$$}n{/$$} columns (one for each team). We can call this matrix {$$}M{/$$}, and the entry in row {$$}i{/$$} and column {$$}j{/$$}, written {$$}M_{i,j}{/$$}, is the chance that the computer will move to team {$$}i{/$$} from team {$$}j{/$$}. Be very careful with that order! {$$}M_{i,j}{/$$} is the chance of moving from {$$}j{/$$} to {$$}i{/$$}, not the other way around. For example, in our abbreviated league, the entry {$$}M_{1,3}=0.4{/$$} is the chance that the computer moves from the Dallas Cowboys (Team 3) to the Denver Broncos (Team 1).
+Unlike previous projects, this project does not introduce any new Python techniques. So there's a good chance that you can just tackle it. But there are some tricks that may be new, so take a look at the rest of this chapter if you get stuck.
 
-If you define the matrix {$$}M{/$$} as described above and an initial distribution vector {$$}v{/$$}, the operation that finds {$$}v_2{/$$}, the new and improved distribution vector is given by matrix-vector multiplication. In particular, {$$}v_2 = Mv{/$$}. 
+## Random Numbers
 
-You can represent matrices and vectors in Python in many different ways, and you can also find different ways to compute the product of a matrix and a vector in Python. But by far the best way is to use the module `numpy`, which set the bar for scientific computing in Python. So if you haven't used `numpy` before, take the time to learn it just enough to complete this project. You won't regret it.
+In this project, you will use random numbers for several different tasks:
 
-To summarize, we can find a good distribution as follows:
+* Configuring the initial substitution key, where each letter is mapped to a random letter,
+* Choosing two letters to "swap" in order to make a new substitution key, and
+* Deciding whether to switch to the new substitution key when it's not as good as the original key.
 
-1. Define the matrix {$$}M{/$$} by exploring the historical game data.
-2. Start with a random vector {$$}v{/$$} (which should have entries adding up to 1).
-3. Repeatedly compute {$$}v = Mv{/$$} using matrix-vector multiplication.
-4. As the end, scale the vector {$$}v{/$$} so that its entries add up to 1.
+To use random numbers, first import the `random` module. This module contains many different functions related to random numbers. For example, the function `random.shuffle(l)` will randomly rearrange the items in the list `l`. This is illustrated in the code in Listing 5.1, where the list `l` will end up as some permutation of `[1, 2, 3, 4, 5]`, possibly but not necessarily `[1, 5, 4, 3, 2]`.
 
-Notice that the vector is normalized in Step 4, so that it represents an actual probability vector (i.e., so that its entries add up to 1).  It  usually helps to normalize the vector each time in the loop in Step 3, just to keep it from growing too large or too small.
-
-So there you have it. We've seen two different ways of using the historical game data to come up with a ranking of NFL teams. You should implement both of these techniques, and you can compare the results to see how close they are to each other. Be sure to loop enough times for the results to stabilize, at least 1,000,000 for the random walk and 10,000 for the matrix-vector multiply.
-
-## Reading a CSV File
-
-You can find all the data data for 25 years' worth of NFL games at <http://www.repole.com/sun4cast/data.html>, and you can also download a single file that combines this data from the book resource repository. This file starts like this:
-
+{title="Listing 5.1: Permuting a List Randomly", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
-Date,Visitor,Visitor Score,Home Team,Home Score,Line,Total Line
-09/02/1978,NYG,19,TB,13,2, 
-09/03/1978,GB,13,DET,7,8, 
-09/03/1978,HOU,14,ATL,20,-3.5, 
-09/03/1978,KC,24,CIN,23,8, 
-09/03/1978,MIA,20,NYJ,33,-4, 
+import random
+
+l = [1, 2, 3, 4, 5]
+random.shuffle(l)
+# l is now a permutation of [1, 2, 3, 4, 5], POSSIBLY [1, 5, 4, 3, 2]
 ~~~~~
 
-As you can see it is a CSV file, that is a file in comma-separated format, where the first line contains the names for the columns, and the other lines contain the data for one specific game. The only data we are interested in are the home and visitor teams and scores.
+You may be troubled by the fact that we cannot know the result of `random.shuffle(l)`. Such is the way of random numbers, and generally we are happy that there is no way to know the result. However, in some settings it is vital that we always get the same results, for example when describing examples in function docstrings. Python allows you to make random numbers totally predictable (in principle) by letting you set the random seed. In particular, if you call `random.seed(19483)`, or any other number instead of `19483`, you are forcing random to return a fixed sequence from that point on. There is no effective way of knowing what values random will return, so in a certain sense they way as well be random still, but you are guaranteed that from that point on, you will always get the same sequence. This is illustrated in Listing 5.2. 
 
-So your first task is to read this file. But how do you read a CSV file in Python? There are two answers to this. First, a CSV file is just a text file, so you could read the same way that you read text files in previous projects. Then you could process each line and split the entries based on the commas in the line. However, breaking up the fields by commas is not as easy as it sounds, because fields could *contain* commas, in which case the fields would be quoted. For example, one of the lines could be
-
-* `"Smith, Alexander", M, 27`
-
-This line has only three fields, not four, but the first field contains a comma. Moreover, quotes themselves are subtle because a field can contain a quote, in which case it must be escaped:
-
-* `"Smith, Alexander \"the great\"", M, 27`
-
-And we won't mention the fact that escape characters, like the \, can themselves be escaped!
-
-We hope this convinces you that you should use an existing Python module to read CSV files instead of coding your own. If nothing else, the existing module has already been used by thousands of people, so there is an excellent chance that any subtle bugs have already been discovered and fixed.
-
-The module to use is called `csv`, and it can both read and write CSV files. The basic approach to reading a CSV file is to 
-
-1. open the file as a text file,
-2. create a csv reader with the open file, and
-3. read each line of the file.
-
-The `csv` module provides two different readers, one that returns each line as a Python list, and another that returns the line as a Python dictionary. We prefer the second, because it is more transparent to access a field as `row['age']` than `row[2]`, since there is no need to remember that the age is stored in the third column. The dictionary uses the column names that it reads from the first row. Listing~5.1 gives an example of using the `csv` dictionary reader.
-
-{title="Listing 5.1: Reading a CSV File", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 5.2: Permuting a List Deterministically", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
-import csv
+import random
 
-with open('players.csv', 'r') as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        print (row['name'], 'is', row['age'], 'years old')
+l = [1, 2, 3, 4, 5]
+random.seed(19483)
+random.shuffle(l)
+# l is now GUARANTEED to be [1, 4, 2, 3, 5]
 ~~~~~
 
-There is one subtlety you are bound to run into. The values in the Python dictionary returned by the `csv` reader are *strings*. For example, the age will be the *string* `"27"` and not the *number* `27`. You will actually want to have numbers so you can compare the scores correctly. Fortunately, Python provides an easy way to convert a string to a number. Just call `int(s)` to convert the string `s` to an integer, provided of course that the string is a valid representation of an integer. For example, `int("27")` is the number `27` that you really want.
+Why would you want to permute a list? This is a good way to initialize the random substitution key. For instance, start with a list containing `["a", "b", ..., "z", " ", "."]` and shuffle it. Then the letter `"a"` can map to the first element of that list, `"b"` to the second one, and so on.
 
-## A Short Numpy Tutorial
+Another useful function is `random.randint(a, b)`. This selects a random integer in the range from `a` to `b` *inclusive*. For example, if you call `random.ranint(1, 3)` a number of times, the function will return either 1, 2, or 3, each a third of the time. This can be used to select two letters to swap to make a new substitution cipher.
 
-`Numpy` is *the* way to process vectors and matrices in Python. Here's why. Suppose you have a vector with 3 elements. You could represent it using a Python list, e.g., `[1, 2, 4]`. This works, but it comes at a significant cost, because Python lists are general data structures, designed to store any types of objects, such as `['fred', 28, 'sally', ['adam', 'eve'], 3.14]`. Moreover, Python lists are mutable, so you can easily extend a list by appending one more element to the end of list, inserting an element half-way through the list, or replacing the middle three elements by two new elements. So Python lists need to be general enough to handle all of these possibilities.
+Finally, the function `random.random()` returns a random number between 0 and 1, such as `0.38737738176471215`. This is often used to decide between two alternatives with a certain probability. For example, if you wish to pick outcome 1 with a probability of 0.25, you can check that the value returned in a call to `random.random()` is less than or equal to 0.25. You will want to use this when you're deciding whether to switch to a new substitution key that is not quite as good as the last one.
 
-In contrast, `numpy` *arrays* are fixed-size arrays of numbers. You create an array of the right size, and you can change the numbers in the array, but you can not append new numbers, delete numbers, or store anything other than a number in a single cell. This allows `numpy` arrays to be implemented much more efficiently than Python lists. This not make a difference for a list with three elements, but in typical data science applications involving thousands or millions of elements, it can make all the difference in the world.
+## Swapping Two Variables
 
-To use `numpy` you have to import the module first. It is customary to rename the module as `np`, so you will often see a line like
+Swapping two variables is a task that is surprisingly difficult. For example, Listing 5.3 shows a common mistake.
 
-* `import numpy as np`
-
-at the top of a program. After importing `numpy`, you can create a `numpy` array using the function `np.array(l)`. The input parameter is a Python list of numbers to create a vector, or a list of rows, where each row is a list of numbers, to create a matrix. Listing 5.2 illustrates this process.
-
-{title="Listing 5.2: Creating Numpy Arrays", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 5.3: Swapping Two Variables Incorrectly", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
-import numpy as np
+x = 1
+y = 2
 
-v = np.array([1, 2, 3])
-m = np.array([[11, 12, 13],
-              [21, 22, 23],
-              [31, 32, 33]])
+x = y
+y = x
 ~~~~~
 
-You can access individual elements of a `numpy` array using list-like indexing notation. For example, you can get the second element of the vector `v` using `v[1]`, as you may have expected. For matrices, the indexing is a little different than when using Python lists. Instead of using two list indexes, as in `m[1][2]`, you use a single compound index. So to get the element in the second row and third column, you would use `m[1,2]`. Naturally, you can use these to get and set the value of an entry. For example, Listing 5.3 shows how you can create a vector with entries that are twice as large as `v`.
+The program in Listing 5.3 does *not* swap the values of `x` and `y`. The reason is that after Line 4, *both* `x` and `y` have the value 2, so Line 5 does essentially nothing. That is, the value 2 in `x` is stored in `y`, which was already 2.
 
-{title="Listing 5.3: Iterating Over Numpy Vectors", lang=python, line-numbers=on, starting-line-number=1}
+What is needed to correct this is to somehow remember the old value of `x` before assigning the value of `y` to it. This is illustrated in Listing 5.4.
+
+{title="Listing 5.4: Swapping Two Variables Correctly", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
-v = np.array([1, 2, 3])
-v2 = np.array([0, 0, 0])
-for i in range(3):
-    v2[i] = 2*v[i]
-~~~~~
+x = 1
+y = 2
 
-At the end of Listing 5.3, `v2` will have the value `array([2, 4, 6])`, where the `array` is used to emphasize that we're working with `numpy` arrays and not Python lists. However, the code in Listing 5.3 has a few problems. The most obvious problem is that it only works for arrays that have exactly three elements. It would obviously be better if we could get the length of the array, just as we can for Python lists. Another problem is that we have to create `v2` with the right number of elements, but we only know how to initialize an array from a Python list, so this means we have to build a list with just the right number of elements first.
-
-Both problems are easy to solve. Every `numpy` array has a property called `shape` that stores the number of rows and columns in the array. So `v.shape[0]` has the number of elements in the vector `v`, `m.shape[0]` the number of rows in `m` and `m.shape[1]` the number of columns in `m`. Moreover, you can create an array of zeros of a given shape with `np.zeros(shape)`. Listing 5.4 uses these functions to improve the vector doubling code in Listing 5.3
-
-{title="Listing 5.4: Iterating Over Numpy Vectors", lang=python, line-numbers=on, starting-line-number=1}
-~~~~~
-v = np.array([1, 2, 3])
-v2 = np.zeros(v.shape)
-for i in range(v.shape[0]):
-    v2[i] = 2*v[i]
+t = x
+x = y
+y = t
 ~~~~~
 
-You can use similar code to double all the entries in the matrix `m`, but you would need two nested loops, one for the rows and another for the columns. However, there are better ways of doing so! You can multiply `numpy` arrays by a constant, and that returns an array that has all the elements of the original multiplied by that constant. In particular, we can double an array as shown in Listing 5.5.
+In Line 4, the variable `t` is introduced simply to keep the value of `x` before it is wiped with the value of `y` in Line 5. Then the variable `y` is assigned this saved value in Line 6, so it ends up with the original value of `x`. This works, with the caveat that we introduced a new temporary variable `x`, and it is very important that there cannot be another variable called `t` in the program!
 
-{title="Listing 5.5: Doubling Numpy Vectors and Matrices", lang=python, line-numbers=on, starting-line-number=1}
+The program in Listing 5.4 works, and it is the only way to swap two variables in most languages. As it turns out, Python offers a better way to swap variables, as seen in Listing 5.5.
+
+{title="Listing 5.4: Swapping Two Variables Pythonically", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
-v = np.array([1, 2, 3])
-m = np.array([[11, 12, 13],
-              [21, 22, 23],
-              [31, 32, 33]])
-v2 = 2*v
-m2 = 2*m
-~~~~~
+x = 1
+y = 2
 
-Of course, you can also add, subtract, or divide all the elements of a `numpy` array using similar code. So should you use the special `numpy` ways of manipulating `numpy` arrays, or should you stick to getting and setting individual elements in the array? It may seem like working with elements individually is a better idea, since it works not just for `numpy` arrays but also for Python lists and other structures. In fact, however, there is a significant advantage to using the specialized routines in `numpy`. These routines are *much* faster than the equivalent Python code that processes individual elements. For example, the `numpy` routines may take advantage of specialized hardware, such as graphics accelerators, to perform the computations, and that will result in vastly faster programs.
-
-Other vector or matrix operations also work on individual elements at a time. For example, the sum of two matrices is the result of adding corresponding elements. Using the `numpy` module, these operations can be performed using the regular arithmetic operators, as seen in Listing 5.6. This only works if the matrices are compatible, i.e., if they have the same shape. Again, using these operators is far preferable to coding your own loops to accomplish the same task in Python.
-
-{title="Listing 5.6: Element-wise Matrix and Vector Operations", lang=python, line-numbers=on, starting-line-number=1}
-~~~~~
-m1 = np.array([[11, 12, 13],
-               [21, 22, 23],
-               [31, 32, 33]])
-m2 = 2*m1
-
-m3 = m1 + m2
+x, y = y, x
 ~~~~~
 
-`Numpy` supports other common matrix and vector operations. For example, the dot product of two vectors can be computed using the function `np.dot(v1,v2)`. Listing 5.7 shows the computation of dot products using a basic for loop and with the `numpy` operation. These will compute the same result, but the `numpy` operation will be significantly faster and is easier to code.
+In Line 4, the values of `x` and `y` *together* are assigned the values of `y` and `x` *together*. What this means is that the value of `y` ends up in `x` and the value in `x` ends up in `y`. This is a very nice shorthand for swapping variables, and it is just one of the ways that the syntax of Python is designed to simplify common tasks.
 
-{title="Listing 5.7: Computing Dot Products", lang=python, line-numbers=on, starting-line-number=1}
+## Copying a Deep Structure
+
+There is a very big subtlety that comes up when you assign a complex structure, like a dictionary or a list, to a new variable. For example, suppose that `x` contains the list `["a", "b", "c"]` and you assign `x` to `y`. What is `y[1]`? I'm sure you agree that it must have the letter `"b"`. But what happens if you change `y[1]` to `"fred"`? Then, obviously, `y[1]` now has the value `"fred"`. So far so good. But now, what is the value of `x[1]`?
+
+If you guessed `"fred"`, then you know the problem we are describing. This is seen in Figure 5.2, which illustrates what happens immediately after `x` is assigned to `y`. As you can see from the graph, after the assignment `x` and `y` are both referring to the *same* list, so changing an entry in `x` will necessarily change the corresponding entry in `y` and vice versa.
+
+![Figure 5.2: Assigning a List](images/x-y-same.png)
+
+If you want `y` to have its own *copy* of the list (or dictionary) that `x` refers to, so that changes in `y` are *not* propagated in `x`, then you need a situation like the one shown in Figure 5.3. But that means that you must copy each element in `x` to a new list in `y`, as shown in Listing 5.5.
+
+![Figure 5.3: Copying a List](images/x-y-cloned.png)
+
+{title="Listing 5.5: Copying the Elements of a List", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
-v1 = np.array([1, 2, 3])
-v2 = np.array([7, -5, 2])
+x = [1, 2, 3, 4, 5]
 
-dot1 = 0
-for i in (v.shape[0]):
-    dot1 = dot1 + v1[i]*v2[i]
-
-dot2 = np.dot(v1, v2)
+y = []
+for e in x:
+    y.append(e)
 ~~~~~
 
-The function `np.dot(...)` can be used to multiply matrices as well as vectors, so if `v` is vector and `m1` and `m2` are matrices, you can use `numpy` to compute any of the following:
+After the code in Listing 5.5 is executed, `x` and `y` will both refer to a list containing the numbers 1, 2, 3, 4, and 5. However, `x` and `y` will refer to *different* list with those elements, as seen in Figure 5.3, so that changes to `y` will not be reflected back in `x` or vice versa.
 
-* `np.dot(m1, v)`
-* `np.dot(v, m2)`
-* `np.dot(m1, m2)`
+Unfortunately, simply copying each element as shown in Listing 5.5, is not enough. The reason is that complex objects, like lists and dictionaries, may contain complex objects inside, such as list inside a list or a list inside a dictionary. Simply copying the elements will result in a new outer list, but both the original list and the copy may still be referring to the same elements. In other words, changes to `x[1]` may still show up in `y[1]`. This situation is illustrated in Figure 5.4. Given the the situation shown in that figure, changing the value of `x[1]["b"]` will *also* necessarily change the value in `y[1]["b"]`.
 
-This works provided that the given products are defined, meaning that the matrices have the right shape to be multiplied. In the third case, for example, the number of columns in `m1` should be the same as the number of rows in `m2`.
+![Figure 5.4: A Dictionary Shared by Two Lists](images/x-y-common-element.png)
 
-Finally, there are functions in `numpy` that calculate various properties of vectors and matrices. For example, the function `np.sum(x)` finds the sum of all the elements in `x`, and it does it much more quickly than the equivalent code using loops.
+As you can see from Figure 5.4, assigning a deep structure from one variable to another in such a way that each variable has its own entire copy is not an easy proposition. You *could* write a function to do it, but luckily Python provides a simple mechanism. Just use `x.copy()` to create a *copy* of `x` and assign that to `y`. This is shown in Listing 5.6.
+
+{title="Listing 5.6: Copying a List Pythonically", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+x = [1, [2, 3, 4], 5]
+
+y = x.copy()
+~~~~~
+
+After the code in Listing 5.6, changes to `y` or its elements will not be reflected in `x` or vice versa, because `x` and `y` will refer to two different copies of the object, and each element in those lists will also refer to different copies. Specifically, the second element of `x`, which is the nested list `[2, 3, 4]`, will also have a *different* copy in `y`.
+
