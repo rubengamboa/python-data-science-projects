@@ -3,6 +3,8 @@
 In this project, you will learn
 
 * How to organize your program by using classes and subclasses
+* How to organize your program by using modules and packages
+* When to use classes as opposed to modules to organize your program
 * How to avoid global variables by using classes
 
 ## Project: What Is the Distribution of Pairs of Letters in the German Language?
