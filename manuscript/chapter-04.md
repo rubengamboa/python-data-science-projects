@@ -15,24 +15,27 @@ In the last project, you built a program that can find the distribution of pairs
 * A different corpus is needed to learn the distribution of letter pairs in German.
 * It should be possible to process both English and German letter pairs in the same program.
 
-Your task is to reorganize your solution to the last project, so that the code is in a Python `class`. The class should be called `ngram`, and it should have the following methods:
+Your task is to reorganize your solution to the last project, so that the code is in a Python `class`. The class should be called `NGram`, and it should have the following methods:
 
-1. An instance variable called `_PAIR_COUNTS`.
-2. An initializer `__init__(self, letters="...")` that initializes the instance variable `_PAIR_COUNTS`. This method should accept an optional argument called `letters` that is a string containing all possible letters (and punctuation marks) in the language. By default, `letters` should have the letters in the English language.
-3. A method called `count_pairs(self, s)` that counts the letter pairs in the string `s` and updates the instance variable `_PAIR_COUNTS` accordingly.
-4. A method called `get_all_frequencies(self)` that creates a Python dictionary with the frequencies of the letter pairs encountered. This uses the information in `_PAIR_COUNTS`, but scales it by the number of pairs seen, so that the results are comparable across different corpora.
-5. A method called `process_file(self, filename)` that reads a corpus and uses it to update the information in `_PAIR_COUNTS`.
+1. An instance variable called `__PAIR_COUNTS`.
+2. An initializer `__init__(self, letters="...")` that initializes the instance variable `__PAIR_COUNTS`. This method should accept an optional argument called `letters` that is a string containing all possible letters (and punctuation marks) in the language. By default, `letters` should have the letters in the English language.
+3. A method called `count_pairs(self, s)` that counts the letter pairs in the string `s` and updates the instance variable `__PAIR_COUNTS` accordingly.
+4. A method called `get_all_frequencies(self)` that creates a Python dictionary with the frequencies of the letter pairs encountered. This uses the information in `__PAIR_COUNTS`, but scales it by the number of pairs seen, so that the results are comparable across different corpora.
+5. A method called `process_file(self, filename)` that reads a corpus and uses it to update the information in `__PAIR_COUNTS`.
+5. A method called `create_wordcloud(self, filename)` that uses the information in `__PAIR_COUNTS` to create a wordcloud and write it to the given `filename`.
 
 As you can see, you have already written all the pieces for this assignment, so what is left to do is to reorganize your solution so that it uses a Python class. In particular, you should be able to use your new class as follows:
 
-{title="Listing 4.1: Using the ngram class", lang=python, line-numbers=on, starting-line-number=1}
+{title="Listing 4.1: Using the NGram class", lang=python, line-numbers=on, starting-line-number=1}
 ~~~~~
-english = ngram()
+english = NGram()
 english.process_file('english-corpus.txt')
+english.create_wordcloud('english-bigrams.png')
 english_freqs = english.get_all_frequencies()
 
-german = ngram()
+german = NGram()
 german.process_file('german-corpus.txt')
+german.create_wordcloud('german-bigrams.png')
 german_freqs = german.get_all_frequencies()
 ~~~~~
 
@@ -122,10 +125,10 @@ class Turtle:
         self.__x, self.__y = self.__calculate_position(steps)
 
     def left(self, angle):
-        self.dir = self.dir + angle
+        self.__dir = self.__dir + angle
 
     def right(self, angle):
-        self.dir = self.dir - angle
+        self.__dir = self.__dir - angle
 
     def __calculate_position(self, steps):
         ...
