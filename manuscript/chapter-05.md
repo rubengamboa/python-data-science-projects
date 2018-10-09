@@ -4,6 +4,7 @@ In this project, you will learn
 
 * How to implement a random walk
 * How to read JSON files into Python objects
+* How to test code with unittest
 
 ## Project: What Does This Say?
 
@@ -149,3 +150,139 @@ y = x.copy()
 
 After the code in Listing 5.6, changes to `y` or its elements will not be reflected in `x` or vice versa, because `x` and `y` will refer to two different copies of the object, and each element in those lists will also refer to different copies. Specifically, the second element of `x`, which is the nested list `[2, 3, 4]`, will also have a *different* copy in `y`.
 
+## Testing Code
+
+Earlier, we tested code by placing examples in the docstring of a function. This works well for functions like `is_prime(n)`, where the examples give a clear description of how working code should behave. But this approach runs into limitations as the code gets bigger and more complex. For example, testing a function that returns a Python dictionary is particularly difficult, and testing functions that use random numbers is practically impossible.
+
+So we will now consider a different way of testing. The idea is to write **new** code that can test the code you're working on. Python provides the module `unittest` that makes writing testing code relatively easy. But to understand how to use `unittest`, we have to revisit Python classes.
+
+### Classes and Inheritance
+
+We first explored classes in Chapter 4, where we refactored the NGram code into its own class. At the time, we focused on the way classes help us organize code, but we mentioned that another aspect of classes is how they help us reuse code. That is our focus now. Writing testing code is conceptually easy, e.g., just check if calling a function with some given arguments returns an expected value. But it involves a lot of tedious details that we would prefer not to deal with, for example generating a reports that shows which tests passed and which did not. What we want is to reuse the tedious code, so that all we have to write are the things that are actually pertinent to a specific test. That's the point of code reuse.
+
+So a Python class can reuse code in another class in two ways. The first is simply to create an instance of the other class and call its methods. For example, in the current project you can have a `Cypher` class that keeps track of an encryption key and provides methods to encode a string, and a separate `CodeBreaker` class that figures out how to break a substitution cypher. The `CodeBreaker` class would call the methods of the `Cypher` class, e.g., the encode method.
+
+The second way is called **inheritance**. The idea is the a class can inherit behavior from another class, in which case we say that a subclass inherits from a superclass. We indicate that a class inherits from a superclass in the `class` definition statement, as in Listing 5.7.
+
+{title="Listing 5.7: Declaring Inheritance from a Superclass", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+class SubClass (SuperClass):
+    ...
+~~~~~
+
+The way inheritance works is like this. Suppose that `SuperClass` defines a method `m1()`, so that if you have an instance `sup` of `SuperClass` you can call `sup.m1()`. Now, suppose that `sub` is an instance of `SubClass`. Then `sub` **inherits** the definition of `m1()` from `SuperClass`, so you can also call `sub.m1()`. The code in `m1()` from `SuperClass` is reused in `SubClass`.
+
+The same is true of variables. For example, suppose that `SuperClass` declares a variable `self.x` so that the `sup` instance can refer to `sup.x`. Then `sub`, a member of the `SubClass`, can also refer to `sub.x`.
+
+Let's take a look at a concrete example. Suppose you're writing a program that takes care of payroll for a small company. The program may have a class to model an `Employee`. Each `Employee` would have a name, address, social security number, and direct deposit information. In addition, the `Employee` class would have a method that deposits the payroll on the `Employee`'s bank. Listing 5.8 shows the skeleton of the `Employee` class.
+
+{title="Listing 5.8: Declaring a Superclass", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+class Employee:
+    def __init__(self, name, address, ssn, deposit):
+        self.name = name
+        self.address = address
+        self.ssn = ssn
+        self.deposit = deposit
+        ...
+    def direct_deposit(self):
+        """Transfer monthly earnings to deposit info"""
+        ...
+~~~~~
+
+But suppose that there are two types of employees in the company, salaried and hourly employees. To handle this, the program may have two subclasses of `Employee`. The `SalariedEmployee` subclass would have a field called `salary`, and the `HourlyEmployee` subclass would have the fields `hourly_rate` and `hours_worked`. Moreover, both subclasses would have a method called `monthly_salary()` that computes that employee's monthly salary. This is shown in Listing 5.9.
+
+{title="Listing 5.9: Declaring Subclasses", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+class HourlyEmployee (Employee):
+    def __init__(self, hourly_rate, hours_worked):
+        self.hourly_rate = hourly_rate
+        self.hours_worked = hours_worked
+        ...
+    def monthly_salary(self):
+        return self.hours_worked * self.hourly_rate
+
+class SalariedEmployee (Employee):
+    def __init__(self, salary):
+        self.salary = salary
+        ...
+    def monthly_salary(self):
+        return self.salary / 12
+~~~~~
+
+Now, suppose that `emp` is an instance of `Employee`. Then you can access the name of the employee by using `emp.name`, and you can pay the employee by calling `emp.direct_deposit()`. Moreover, suppose that `emp` is actually either a `SalariedEmployee` or an `HourlyEmployee`. Then you can find his or her monthly salary by calling `emp.monthly_salary()`. Of course, it would be a mistake to look for `emp.salary`, since `emp` could be an `HourlyEmployee`, in which case it won't have a `salary` field. The important point here is that if `emp` is an instance of one of the subclasses, then you can call the methods of either the superclass or the specific subclass it belongs to. The methods and variables from the superclass are seamlessly inherited from the superclass.
+
+But suppose that the behavior from the superclass isn't exactly appropriate for the subclass. In that case, the subclass can simply define its own method. For example, suppose that some hourly employees are eligible for overtime. Then we can define a subclass of `HourlyEmployee` with an alternative definition of `monthly_salary()` as shown in Listing 5.10.
+
+{title="Listing 5.10: Overriding Methods", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+class HourlyOvertimeEmployee (HourlyEmployee):
+    def __init__(self, hourly_rate, hours_worked):
+        self.hourly_rate = hourly_rate
+        self.hours_worked = hours_worked
+        ...
+    def monthly_salary(self):
+        if self.hours_worked > 160:
+            return self.hours_worked * self.hourly_rate +
+                   (self.hours_worked - 160) * self.hourly_rate / 2
+        else:
+            return self.hours_worked * self.hourly_rate
+~~~~~
+
+Now if `emp` happens to be a `HourlyOvertimeEmployee`, when `emp.monthly_salary()` is called, it is the method defined in `HourlyOvertimeEmployee` that is actually executed. However, if `emp` is an `HourlyEmployee` but not an `HourlyOvertimeEmployee`, the method that is executed is the one defined in `HourlyEmployee`.
+
+What Python is doing is looking for the `monthly_salary()` in the actual class of `emp`. If it finds such a method there, then that method is executed. On the other hand, if the class does not define the method, then Python looks in the immediate superclass and tries again. This process is repeated until Python finds a class that defines the method, and is called **inheritance**. The new wrinkle is that if a subclass defines a method that is also defined in the superclass, then following the process above, Python will find the method of the subclass and execute that one instead of the one from the superclass. This is called **overriding**, and it refers to the fact that the subclass can completely redefine the behavior specified in the superclass.
+
+If you're reading carefully, you may be worried by the description of overriding. What happens, for example, to the `__init__()` method? When you create an `HourlyEmployee`, the `__init__()` method of `HourlyEmployee` must be getting called. But what about `__init__()` from `Employee`?
+
+In some programming languages, the `__init__()` method from the superclass will also be called, but this it not the case in Python. According to the rules for overriding, the `__init__()` method of `HourlyEmployee` overrides the `__init__()` method of `Employee` which is therefore not called. This may be fine some of the time, but it's actually a serious problem in the code. If the `__init__()` method of `Employee` is not called, where is `self.name` initialized, for example?
+
+Python provides a mechanism to allow an instance of a subclass to call an overridden method from the superclass. To do this, simply call `super().method(...)` in the subclass, and the actual `method(...)` implementation that is called will be the one defined in the superclass. For example, to ensure that the `__init__()` method of `Employee` is called, the subclasses should be defined as in Listing 5.11. Notice that the call to `super().__init__()` has the arguments needed to initialize an `Employee`, so these were also added to the arguments for `__init__()` in each of the subclasses. In general, the subclass needs to have enough information to properly initialize the superclass.
+
+{title="Listing 5.11: Calling Overridden Methods", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+class HourlyEmployee (Employee):
+    def __init__(self, name, address, ssn, deposit, hourly_rate, hours_worked):
+        super().__init__(name, address, ssn, deposit)
+        self.hourly_rate = hourly_rate
+        self.hours_worked = hours_worked
+        ...
+    def monthly_salary(self):
+        return self.hours_worked * self.hourly_rate
+
+class SalariedEmployee (Employee):
+    def __init__(self, name, address, ssn, deposit, salary):
+        super().__init__(name, address, ssn, deposit)   
+        self.salary = salary
+        ...
+    def monthly_salary(self):
+        return self.salary / 12
+~~~~~
+
+To summarize the key points, the superclass provides some behavior that can be reused by the subclasses, e.g., `direct_deposit()`. The subclasses, in turn, can provide some new behavior of their own that is totally unknown to the parent class, for example the `hourly_rate` of a `SalariedEmployee`. They can also provide different implementations of behavior that is in common to all subclasses, as with `monthly_salary()`. Subclasses can override methods defined in a superclass, and this allows a subclass to provide a behavior that is more appropriate than the default behavior specified in the superclass, as in `monthly_salary()` of the `HourlyOvertimeEmployee` class. When a method is overridden, Python will call the implementation in the subclass instead of the one in the superclass. But it is still possible to call the implementation of the superclass explicitly by using `super()`, and this is particularly important for the `__init__()` method.
+
+### Python's Unittest
+
+The Python `unittest` module provides a sophisticated framework for testing classes and functions. The key component is the class `unittest.TestCase` that simplifies the process of testing by taking care of the routine tasks of testing, like generating a report of the test results, so you can concentrate on the actual tests.
+
+To use `unittest`, you should break your testing scenarios into test cases, which correspond to a coherent unit of testing, e.g., a single test case may be used to test a single class or a group of closely related functions. Each test case inherits from the class `unittest.TestCase` and by convention the test case class should end in `End`.
+
+A test case should have one test method for each separate test that should be performed. You could put all the tests in a single method, but you should use a separate test method for each method of the original class you want to test. By convention, the name of each test method should start with `test_`. For example, if you have a class called `HourlyEmployeeTest`, then you should at the very least have a method called `test_monthly_salary()`. In addition, you may have other test methods to test special scenarios. For example, you can have a test that checks the code does something reasonable when the number of hours is negative or greater than the number of hours in 100 years. Listing 5.12 shows a sample test case.
+
+{title="Listing 5.12: A Test Case", lang=python, line-numbers=on, starting-line-number=1}
+~~~~~
+import unittest
+
+class HourlyEmployeeTest (unittest.TestCase):
+    def test_monthly_salary(self):
+        emp = HourlyEmployee ("Sally", "1 Main St", "567-89-1234", 
+                              "First Global Bank Acct #11122", 
+                              15.00, 80)
+        self.assertEqual(emp.monthly_salary(), 1200.0)
+        emp2 = HourlyEmployee ("Fred", "100 S. 32nd St", "456-78-9012", 
+                               "Second Global Bank Acct #34567", 
+                               10.00, 40)
+        self.assertEqual(emp2.monthly_salary(), 400.0)
+~~~~~
+
+After writing the tests, you can have `unittest` run through all of them by calling `unittest.main()`. This will generate a report that will let you know how many tests were run, and the results of the tests.
